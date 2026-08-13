@@ -225,24 +225,46 @@ st.caption(
 
 with st.sidebar:
     st.subheader(":material/smart_toy: AI summaries", anchor=False)
-    gateway_enabled = os.getenv("LLM_GATEWAY_ENABLED", "false").lower() == "true"
+
+    # Local development can keep using the LiteLLM gateway. Cloud deployments
+    # can bypass it and call any OpenAI-compatible endpoint directly (for
+    # example OpenRouter) by setting OPENAI_BASE_URL / OPENAI_API_KEY.
+    gateway_url = os.getenv("LLM_GATEWAY_URL", "")
     gateway_key = os.getenv("LLM_GATEWAY_API_KEY", "")
+    direct_url = os.getenv("OPENAI_BASE_URL", "")
+    direct_key = os.getenv("OPENAI_API_KEY", "")
+    gateway_enabled = (
+        os.getenv("LLM_GATEWAY_ENABLED", "").lower() == "true"
+        or bool(gateway_key)
+        or bool(direct_key)
+    )
+
     use_ai = st.toggle(
         "Generate AI summary",
-        value=gateway_enabled and bool(gateway_key),
-        help="Uses the portfolio LiteLLM gateway. If disabled or unavailable, the crawler still works and shows a plain text excerpt.",
+        value=gateway_enabled,
+        help="Uses the configured OpenAI-compatible LLM endpoint. Local development can use LiteLLM; cloud deployments can use OpenRouter directly.",
     )
-    if use_ai and gateway_key:
-        llm_base_url = os.getenv("LLM_GATEWAY_URL", "http://litellm:4000/v1")
-        llm_api_key = gateway_key
-        llm_model = os.getenv("LLM_GATEWAY_MODEL", "portfolio-free")
+
+    if use_ai and (gateway_key or direct_key):
+        llm_base_url = gateway_url or direct_url or "https://openrouter.ai/api/v1"
+        llm_api_key = gateway_key or direct_key
+        llm_model = (
+            os.getenv("LLM_GATEWAY_MODEL", "")
+            or os.getenv("OPENAI_MODEL", "")
+            or os.getenv("OPENAI_MODEL_ID", "")
+            or "openrouter/free"
+        )
         ollama_url = os.getenv("OLLAMA_URL", "")
         ollama_model = os.getenv("OLLAMA_MODEL", "")
     else:
-        llm_base_url, llm_api_key, llm_model = "", "", "portfolio-free"
-        ollama_url = os.getenv("OLLAMA_URL", "") if os.getenv("USE_OLLAMA_FALLBACK", "false").lower() == "true" else ""
+        llm_base_url, llm_api_key, llm_model = "", "", "openrouter/free"
+        ollama_url = (
+            os.getenv("OLLAMA_URL", "")
+            if os.getenv("USE_OLLAMA_FALLBACK", "false").lower() == "true"
+            else ""
+        )
         ollama_model = os.getenv("OLLAMA_MODEL", "")
-        st.caption("AI summaries are optional. Without the gateway, the crawler uses a short text excerpt.")
+        st.caption("AI summaries are optional. Without an LLM key, the crawler uses a short text excerpt.")
 
     st.divider()
     st.subheader(":material/history: Run history", anchor=False)
