@@ -157,3 +157,7 @@ determinism of the crawl pipeline.
 ### Safety model
 
 The crawler does not submit forms or activate arbitrary buttons during a normal crawl. The QA execution engine only runs explicitly classified non-destructive checks. Authentication credentials are supplied through the UI/environment and are not written into generated reports.
+
+## CI scope
+
+GitHub Actions validates the deployable Streamlit crawler (`app.py`, `crawler.py`) and the automated tests. The repository also contains historical crawler experiments under `POC/`; those are retained as reference material but are intentionally excluded from the production CI quality gate because they are not part of the Render runtime.

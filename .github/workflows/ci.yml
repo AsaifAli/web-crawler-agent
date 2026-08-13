@@ -9,17 +9,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt -r requirements-dev.txt
           python -m playwright install --with-deps chromium
-      - name: Lint
-        run: ruff check .
-      - name: Compile
-        run: python -m compileall -q .
+
+      # Lint only the deployable application and tests.
+      # Legacy POC experiments are preserved in POC/ but are intentionally
+      # outside the production CI quality gate.
+      - name: Lint production code
+        run: ruff check app.py crawler.py tests
+
+      # Compile the deployable application and tests. Legacy POCs are not
+      # part of the public deployment artifact/runtime path.
+      - name: Compile production code
+        run: python -m compileall -q app.py crawler.py tests
+
       - name: Tests
         run: pytest -q

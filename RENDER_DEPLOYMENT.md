@@ -18,3 +18,7 @@ Playwright/Chromium is resource-intensive. The demo intentionally limits crawl d
 Set `OPENAI_API_KEY` in Render.
 
 Do not commit API keys or local `.env` files to GitHub.
+
+
+## CI gate
+GitHub Actions checks the public application entrypoint and tests before deployment. Historical POC code remains in the repository for reference and is not included in the Render runtime.
