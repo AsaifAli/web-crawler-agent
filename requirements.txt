@@ -1,0 +1,11 @@
+streamlit>=1.57
+# Pinned exactly: must match the mcr.microsoft.com/playwright/python base image
+# tag in the Dockerfile, which ships browser binaries for this Playwright version only.
+playwright==1.47.0
+pydantic>=2
+requests>=2.31
+markdown2>=2.4
+python-dotenv>=1.0
+pandas>=2
+
+python-docx>=1.1

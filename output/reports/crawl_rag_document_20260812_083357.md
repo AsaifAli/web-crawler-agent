@@ -1,0 +1,960 @@
+# Web Crawl & QA Analysis
+
+**Generated on**: 2026-08-12 08:33:57
+**Application ID**: crawl
+**Base URL**: https://orangehrm.com/
+
+## Crawl Summary
+
+- **Pages visited**: 2
+- **Successful**: 2
+- **Forms**: 2
+- **Interactive elements**: 474
+- **Generated test cases**: 17
+- **QA risk**: 0 high / 2 medium / 0 low
+- **Console errors**: 1
+- **Failed network requests**: 6
+- **Accessibility findings**: 6
+- **API/XHR responses**: 4
+
+## Regression Snapshot
+
+The crawl stores a lightweight baseline of page structure, forms, interactions, links, and QA risk for future comparisons.
+
+## Generated QA Test Plan
+
+| ID | Test case | Priority | Category |
+|---|---|---|---|
+| TC-001 | Verify form renders correctly | High | Functional |
+| TC-002 | Verify form submission | High | Functional |
+| TC-003 | Verify input controls | Medium | Accessibility |
+| TC-004 | Verify interactive buttons | Medium | Functional |
+| TC-005 | Verify navigation links | Medium | Navigation |
+| TC-006 | Verify page structure | Low | Content |
+| TC-007 | Review accessibility findings | High | Accessibility |
+| TC-008 | Investigate failed network requests | High | Reliability |
+| TC-001 | Verify form renders correctly | High | Functional |
+| TC-002 | Verify form submission | High | Functional |
+| TC-003 | Verify input controls | Medium | Accessibility |
+| TC-004 | Verify interactive buttons | Medium | Functional |
+| TC-005 | Verify navigation links | Medium | Navigation |
+| TC-006 | Verify page structure | Low | Content |
+| TC-007 | Review accessibility findings | High | Accessibility |
+| TC-008 | Investigate browser console errors | High | Reliability |
+| TC-009 | Investigate failed network requests | High | Reliability |
+
+### TC-001 — Verify form renders correctly
+**Objective:** Verify all detected form fields and submit controls are visible and usable.
+**Priority:** High  
+**Category:** Functional
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Open the page.
+2. Locate each detected form.
+3. Verify fields and submit controls are visible and enabled.
+**Expected result:** All detected controls are rendered, labeled, and usable.
+**Evidence:**
+- Detected 1 form(s)
+
+### TC-002 — Verify form submission
+**Objective:** Verify a form can be submitted with representative valid test data and reaches the expected application state.
+**Priority:** High  
+**Category:** Functional
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Open the form.
+2. Enter safe test data appropriate to each field type.
+3. Submit using an authorized test environment.
+4. Verify the resulting page or response.
+**Expected result:** The form completes successfully or presents actionable validation feedback.
+**Evidence:**
+- Detected 1 form(s) with 3 field(s)
+
+### TC-003 — Verify input controls
+**Objective:** Verify 4 detected input/select/textarea control(s) accept appropriate values and expose usable labels.
+**Priority:** Medium  
+**Category:** Accessibility
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Inspect each input control.
+2. Verify its label, placeholder, type, and state.
+3. Enter a representative value where safe.
+**Expected result:** Controls accept appropriate values and provide an understandable accessible name or label.
+**Evidence:**
+- Detected 4 input control(s)
+
+### TC-004 — Verify interactive buttons
+**Objective:** Verify 46 detected button control(s) respond correctly to authorized user interaction.
+**Priority:** Medium  
+**Category:** Functional
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Identify each button.
+2. Verify its label and enabled state.
+3. Activate it in a safe test environment.
+4. Verify the resulting state.
+**Expected result:** The button performs its intended action or provides clear feedback.
+**Evidence:**
+- Detected 46 button control(s)
+
+### TC-005 — Verify navigation links
+**Objective:** Verify 200 detected navigation link(s) resolve to intended destinations.
+**Priority:** Medium  
+**Category:** Navigation
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Open each internal link.
+2. Verify the destination loads successfully.
+3. Check for unexpected redirects or errors.
+**Expected result:** Links resolve to reachable, expected destinations.
+**Evidence:**
+- Detected 200 navigation link(s)
+
+### TC-006 — Verify page structure
+**Objective:** Verify the page exposes a meaningful heading hierarchy and section structure.
+**Priority:** Low  
+**Category:** Content
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Inspect the heading hierarchy.
+2. Check for a logical H1-to-Hn structure.
+3. Verify major content sections have meaningful labels.
+**Expected result:** The page structure is understandable and logically organized.
+**Evidence:**
+- Detected 60 heading(s)
+
+### TC-007 — Review accessibility findings
+**Objective:** Review 3 DOM-based accessibility finding(s) and confirm remediation where appropriate.
+**Priority:** High  
+**Category:** Accessibility
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Open the page.
+2. Review the flagged controls or document metadata.
+3. Verify each issue against the application's accessibility requirements.
+**Expected result:** Interactive controls and document semantics expose appropriate accessible names and structure.
+**Evidence:**
+- Captured 3 accessibility finding(s)
+
+### TC-008 — Investigate failed network requests
+**Objective:** Investigate 3 failed network request(s) captured during page load.
+**Priority:** High  
+**Category:** Reliability
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Open the page.
+2. Inspect failed requests.
+3. Verify response status and request URL.
+4. Determine whether each failure is expected or a defect.
+**Expected result:** Critical resources and application requests complete successfully.
+**Evidence:**
+- Captured 3 failed request(s)
+
+### TC-001 — Verify form renders correctly
+**Objective:** Verify all detected form fields and submit controls are visible and usable.
+**Priority:** High  
+**Category:** Functional
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Open the page.
+2. Locate each detected form.
+3. Verify fields and submit controls are visible and enabled.
+**Expected result:** All detected controls are rendered, labeled, and usable.
+**Evidence:**
+- Detected 1 form(s)
+
+### TC-002 — Verify form submission
+**Objective:** Verify a form can be submitted with representative valid test data and reaches the expected application state.
+**Priority:** High  
+**Category:** Functional
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Open the form.
+2. Enter safe test data appropriate to each field type.
+3. Submit using an authorized test environment.
+4. Verify the resulting page or response.
+**Expected result:** The form completes successfully or presents actionable validation feedback.
+**Evidence:**
+- Detected 1 form(s) with 18 field(s)
+
+### TC-003 — Verify input controls
+**Objective:** Verify 18 detected input/select/textarea control(s) accept appropriate values and expose usable labels.
+**Priority:** Medium  
+**Category:** Accessibility
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Inspect each input control.
+2. Verify its label, placeholder, type, and state.
+3. Enter a representative value where safe.
+**Expected result:** Controls accept appropriate values and provide an understandable accessible name or label.
+**Evidence:**
+- Detected 18 input control(s)
+
+### TC-004 — Verify interactive buttons
+**Objective:** Verify 26 detected button control(s) respond correctly to authorized user interaction.
+**Priority:** Medium  
+**Category:** Functional
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Identify each button.
+2. Verify its label and enabled state.
+3. Activate it in a safe test environment.
+4. Verify the resulting state.
+**Expected result:** The button performs its intended action or provides clear feedback.
+**Evidence:**
+- Detected 26 button control(s)
+
+### TC-005 — Verify navigation links
+**Objective:** Verify 180 detected navigation link(s) resolve to intended destinations.
+**Priority:** Medium  
+**Category:** Navigation
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Open each internal link.
+2. Verify the destination loads successfully.
+3. Check for unexpected redirects or errors.
+**Expected result:** Links resolve to reachable, expected destinations.
+**Evidence:**
+- Detected 180 navigation link(s)
+
+### TC-006 — Verify page structure
+**Objective:** Verify the page exposes a meaningful heading hierarchy and section structure.
+**Priority:** Low  
+**Category:** Content
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Inspect the heading hierarchy.
+2. Check for a logical H1-to-Hn structure.
+3. Verify major content sections have meaningful labels.
+**Expected result:** The page structure is understandable and logically organized.
+**Evidence:**
+- Detected 23 heading(s)
+
+### TC-007 — Review accessibility findings
+**Objective:** Review 3 DOM-based accessibility finding(s) and confirm remediation where appropriate.
+**Priority:** High  
+**Category:** Accessibility
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Open the page.
+2. Review the flagged controls or document metadata.
+3. Verify each issue against the application's accessibility requirements.
+**Expected result:** Interactive controls and document semantics expose appropriate accessible names and structure.
+**Evidence:**
+- Captured 3 accessibility finding(s)
+
+### TC-008 — Investigate browser console errors
+**Objective:** Investigate 1 browser console error(s) captured during page load.
+**Priority:** High  
+**Category:** Reliability
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Open the page.
+2. Reproduce the load state.
+3. Inspect console errors and their source.
+4. Determine whether they affect user-visible behavior.
+**Expected result:** No unexpected application errors remain in the browser console.
+**Evidence:**
+- Captured 1 console error(s)
+
+### TC-009 — Investigate failed network requests
+**Objective:** Investigate 3 failed network request(s) captured during page load.
+**Priority:** High  
+**Category:** Reliability
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Open the page.
+2. Inspect failed requests.
+3. Verify response status and request URL.
+4. Determine whether each failure is expected or a defect.
+**Expected result:** Critical resources and application requests complete successfully.
+**Evidence:**
+- Captured 3 failed request(s)
+
+
+## Page: Solutions
+
+**URL**: https://orangehrm.com
+
+**Title**: OrangeHRM: All in One HR Software for Businesses | OrangeHRM
+
+**Status**: success: Playwright
+
+**QA risk**: Medium (54/100)
+
+**Risk factors:**
+- 1 form(s) detected
+- 46 interactive button(s)
+- 200 navigation link(s)
+- 3 failed network request(s)
+- 3 accessibility finding(s)
+
+**Page load**: 7632 ms
+
+**Browser console errors**: 0
+
+**Failed network requests**: 3
+
+**Accessibility findings**: 3
+
+**API/XHR responses**: 2
+
+**Summary**:
+.feature-card { background: white; border-radius: 16px; padding: 50px; text-align: center; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); transition: transform 0.3s ease-in-out; } .feature-card:hover { t...
+
+**Headings**:
+- H2: Solutions
+- H2: Why OrangeHRM
+- H2: Resources
+- H2: Company
+- H2: Pricing
+- H1: Streamline All Your HR Needs on One Intuitive Platform
+- H5: Join Over 5 Million Users Who Trust OrangeHRM as Their Trusted HR Software Partner
+- H2: Consolidate Your HR Processes into One Smart Platform
+- H3: People Management
+- H3: Talent Management
+- H3: Compensation
+- H3: Culture
+- H2: White Glove Implementation and Exceptional Support
+- H5: Flexible hosting options to suit your needs!
+- H5: Ongoing support wherever you are located!
+- H2: Connect OrangeHRM to Your Existing Tech Stack
+- H2: What Our Clients Say
+- H5: Maria Glezos
+- H5: Stephanie Callan
+- H5: Guillermo Cogorno
+- H5: Dawn Lambert
+- H5: Andreas Tziarras
+- H5: Earl Dela Torre
+- H5: Hassaan Ahmad
+- H5: Irina Rogozhina
+- H5: Fabian Di Gregorio
+- H5: Maria Glezos
+- H5: Stephanie Callan
+- H5: Guillermo Cogorno
+- H5: Dawn Lambert
+- H5: Andreas Tziarras
+- H5: Earl Dela Torre
+- H5: Hassaan Ahmad
+- H5: Irina Rogozhina
+- H5: Fabian Di Gregorio
+- H5: Maria Glezos
+- H2: Frequently Asked Questions
+- H2: Does OrangeHRM offer a free version?
+- H2: Is there a free trial?
+- H2: What is the difference between the OrangeHRM Starter and Advanced?
+- H2: Is OrangeHRM cloud-based or on-premise?
+- H2: How is OrangeHRM priced?
+- H2: What systems does OrangeHRM integrate with?
+- H2: Can I upgrade from the free version to Advanced?
+- H2: How do I get started with OrangeHRM?
+- H2: How long does it take to implement OrangeHRM?
+- H2: How does OrangeHRM protect my employee data?
+- H2: Is OrangeHRM GDPR compliant?
+- H2: Does OrangeHRM have a mobile app?
+- H2: Does OrangeHRM support AI features?
+- H2: Is OrangeHRM suitable for small businesses?
+- H2: Can OrangeHRM be customized for my industry?
+- H2: Does OrangeHRM support multi-location or global teams?
+- H2: What kind of customer support does OrangeHRM provide?
+- H2: How do I contact OrangeHRM support for technical or general inquiries?
+- H4: Still have questions?
+- H5: Company
+- H5: Resources
+- H5: Policies
+- H5: Alternatives
+
+**Forms**:
+
+- Form 1: POST /home/submitForm — 3 fields
+  - email `EmailHomePage` (optional)
+  - hidden `SecurityID` (optional)
+  - submit `action_request` (optional)
+
+**Interaction candidates**:
+- navigate: Register Now (safe-by-default: True)
+- click: × (safe-by-default: False)
+- navigate: a (safe-by-default: True)
+- click: Toggle navigation (safe-by-default: False)
+- navigate: Solutions (safe-by-default: True)
+- navigate: Starter (Open Source) (safe-by-default: True)
+- navigate: Advanced (30 Day Free Trial) (safe-by-default: True)
+- navigate: Rostero NEW (safe-by-default: True)
+- navigate: Connectors (safe-by-default: True)
+- navigate: OrangeHRM AI (safe-by-default: True)
+- navigate: App Builder NEW (safe-by-default: True)
+- navigate: People Management (safe-by-default: True)
+- navigate: Talent Management (safe-by-default: True)
+- navigate: Compensation (safe-by-default: True)
+- navigate: Culture (safe-by-default: True)
+- navigate: HR Administration (safe-by-default: True)
+- navigate: Employee Management (safe-by-default: True)
+- navigate: Reporting & Analytics (safe-by-default: True)
+- navigate: Mobile App (safe-by-default: True)
+- navigate: Recruitment (safe-by-default: True)
+- navigate: Onboarding (safe-by-default: True)
+- navigate: Request Desk (safe-by-default: True)
+- navigate: Leave Management (safe-by-default: True)
+- navigate: Time and Attendance (safe-by-default: True)
+- navigate: Roster (safe-by-default: True)
+- navigate: Performance Management (safe-by-default: True)
+- navigate: Career Development (safe-by-default: True)
+- navigate: Training (safe-by-default: True)
+- navigate: Surveys (safe-by-default: True)
+- navigate: Employee Voice NEW (safe-by-default: True)
+- navigate: Discipline (safe-by-default: True)
+- navigate: Why OrangeHRM (safe-by-default: True)
+- navigate: Starter (Open Source) (safe-by-default: True)
+- navigate: Advanced (30 Day Free Trial) (safe-by-default: True)
+- navigate: Flexible Hosting (safe-by-default: True)
+- navigate: App Builder NEW (safe-by-default: True)
+- navigate: Stakeholder Solutions (safe-by-default: True)
+- navigate: Switch to
+                                                OrangeHRM (safe-by-default: True)
+- navigate: Case Studies (safe-by-default: True)
+- navigate: Testimonials (safe-by-default: True)
+- navigate: Healthcare (safe-by-default: True)
+- navigate: Manufacturing (safe-by-default: True)
+- navigate: Education (safe-by-default: True)
+- navigate: Small Businesses (safe-by-default: True)
+- navigate: Medium Businesses (safe-by-default: True)
+- navigate: HR Manager (safe-by-default: True)
+- navigate: C-Suite (safe-by-default: True)
+- navigate: Recruiter (safe-by-default: True)
+- navigate: IT Manager (safe-by-default: True)
+- navigate: HR for All (safe-by-default: True)
+- navigate: Services & Support (safe-by-default: True)
+- navigate: Customizations (safe-by-default: True)
+- navigate: Resources (safe-by-default: True)
+- navigate: Starter (Open Source) (safe-by-default: True)
+- navigate: Advanced (30 Day Free Trial) (safe-by-default: True)
+- navigate: Certification Program (safe-by-default: True)
+- navigate: App Builder NEW (safe-by-default: True)
+- navigate: eBooks (safe-by-default: True)
+- navigate: Blog (safe-by-default: True)
+- navigate: The HR Dictionary (safe-by-default: True)
+- navigate: Webinars (safe-by-default: True)
+- navigate: Starter Overview (Open Source) (safe-by-default: True)
+- navigate: Advanced Overview (Short) (safe-by-default: True)
+- navigate: Advanced Overview (Long) (safe-by-default: True)
+- navigate: OrangeHRM ROI (safe-by-default: True)
+- navigate: HR's Guide to Effective Career Development (safe-by-default: True)
+- navigate: Data Security Promise (safe-by-default: True)
+- navigate: Starter Forum (Open Source) (safe-by-default: True)
+- navigate: OrangeHRM API (safe-by-default: True)
+- navigate: Company (safe-by-default: True)
+- navigate: Starter (Open Source) (safe-by-default: True)
+- navigate: Advanced (30 Day Free Trial) (safe-by-default: True)
+- navigate: Become a Partner (safe-by-default: True)
+- navigate: App Builder NEW (safe-by-default: True)
+- navigate: About Us (safe-by-default: True)
+- navigate: Press Releases (safe-by-default: True)
+- navigate: News Articles (safe-by-default: True)
+- navigate: Careers (safe-by-default: True)
+- navigate: Contact Us (safe-by-default: True)
+- navigate: Pricing (safe-by-default: True)
+- click: Solutions (safe-by-default: False)
+- navigate: Starter (Open Source) (safe-by-default: True)
+- navigate: Advanced 30-Day Free Trial (safe-by-default: True)
+- navigate: Rostero - Scheduling Software (safe-by-default: True)
+- navigate: Connectors (safe-by-default: True)
+- navigate: OrangeHRM AI (safe-by-default: True)
+- navigate: App Builder (safe-by-default: True)
+- navigate: People Management (safe-by-default: True)
+- navigate: HR Administration (safe-by-default: True)
+- navigate: Employee Management (safe-by-default: True)
+- navigate: Reporting & Analytics (safe-by-default: True)
+- navigate: Mobile App (safe-by-default: True)
+- navigate: Talent Management (safe-by-default: True)
+- navigate: Recruitment (safe-by-default: True)
+- navigate: Onboarding (safe-by-default: True)
+- navigate: Request Desk (safe-by-default: True)
+- navigate: Compensation (safe-by-default: True)
+- navigate: Leave Management (safe-by-default: True)
+- navigate: Time and Attendance (safe-by-default: True)
+- navigate: Roster (safe-by-default: True)
+
+**Generated test cases**:
+
+| ID | Test case | Priority | Category |
+|---|---|---|---|
+| TC-001 | Verify form renders correctly | High | Functional |
+| TC-002 | Verify form submission | High | Functional |
+| TC-003 | Verify input controls | Medium | Accessibility |
+| TC-004 | Verify interactive buttons | Medium | Functional |
+| TC-005 | Verify navigation links | Medium | Navigation |
+| TC-006 | Verify page structure | Low | Content |
+| TC-007 | Review accessibility findings | High | Accessibility |
+| TC-008 | Investigate failed network requests | High | Reliability |
+
+### TC-001 — Verify form renders correctly
+**Objective:** Verify all detected form fields and submit controls are visible and usable.
+**Priority:** High  
+**Category:** Functional
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Open the page.
+2. Locate each detected form.
+3. Verify fields and submit controls are visible and enabled.
+**Expected result:** All detected controls are rendered, labeled, and usable.
+**Evidence:**
+- Detected 1 form(s)
+
+### TC-002 — Verify form submission
+**Objective:** Verify a form can be submitted with representative valid test data and reaches the expected application state.
+**Priority:** High  
+**Category:** Functional
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Open the form.
+2. Enter safe test data appropriate to each field type.
+3. Submit using an authorized test environment.
+4. Verify the resulting page or response.
+**Expected result:** The form completes successfully or presents actionable validation feedback.
+**Evidence:**
+- Detected 1 form(s) with 3 field(s)
+
+### TC-003 — Verify input controls
+**Objective:** Verify 4 detected input/select/textarea control(s) accept appropriate values and expose usable labels.
+**Priority:** Medium  
+**Category:** Accessibility
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Inspect each input control.
+2. Verify its label, placeholder, type, and state.
+3. Enter a representative value where safe.
+**Expected result:** Controls accept appropriate values and provide an understandable accessible name or label.
+**Evidence:**
+- Detected 4 input control(s)
+
+### TC-004 — Verify interactive buttons
+**Objective:** Verify 46 detected button control(s) respond correctly to authorized user interaction.
+**Priority:** Medium  
+**Category:** Functional
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Identify each button.
+2. Verify its label and enabled state.
+3. Activate it in a safe test environment.
+4. Verify the resulting state.
+**Expected result:** The button performs its intended action or provides clear feedback.
+**Evidence:**
+- Detected 46 button control(s)
+
+### TC-005 — Verify navigation links
+**Objective:** Verify 200 detected navigation link(s) resolve to intended destinations.
+**Priority:** Medium  
+**Category:** Navigation
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Open each internal link.
+2. Verify the destination loads successfully.
+3. Check for unexpected redirects or errors.
+**Expected result:** Links resolve to reachable, expected destinations.
+**Evidence:**
+- Detected 200 navigation link(s)
+
+### TC-006 — Verify page structure
+**Objective:** Verify the page exposes a meaningful heading hierarchy and section structure.
+**Priority:** Low  
+**Category:** Content
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Inspect the heading hierarchy.
+2. Check for a logical H1-to-Hn structure.
+3. Verify major content sections have meaningful labels.
+**Expected result:** The page structure is understandable and logically organized.
+**Evidence:**
+- Detected 60 heading(s)
+
+### TC-007 — Review accessibility findings
+**Objective:** Review 3 DOM-based accessibility finding(s) and confirm remediation where appropriate.
+**Priority:** High  
+**Category:** Accessibility
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Open the page.
+2. Review the flagged controls or document metadata.
+3. Verify each issue against the application's accessibility requirements.
+**Expected result:** Interactive controls and document semantics expose appropriate accessible names and structure.
+**Evidence:**
+- Captured 3 accessibility finding(s)
+
+### TC-008 — Investigate failed network requests
+**Objective:** Investigate 3 failed network request(s) captured during page load.
+**Priority:** High  
+**Category:** Reliability
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Open the page.
+2. Inspect failed requests.
+3. Verify response status and request URL.
+4. Determine whether each failure is expected or a defect.
+**Expected result:** Critical resources and application requests complete successfully.
+**Evidence:**
+- Captured 3 failed request(s)
+
+
+**Content**:
+.feature-card { background: white; border-radius: 16px; padding: 50px; text-align: center; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); transition: transform 0.3s ease-in-out; } .feature-card:hover { transform: translateY(-5px); } .icon-support { display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 12px; margin: 0 auto 15px; } .icon-1 { background-color: #ffece6; } .icon-2 { background-color: #e6f7f9; } .learn-more { position: relative; } .learn-more a { color: #000000; font-weight: 600; text-decoration: none; } .product-list ul a { text-decoration: none; } .learn-more a::after { content: ""; display: block; width: 16px; height: 20px; background-image: url('/public/newweb/icon/ArrowRight.png'); background-size: contain; background-repeat: no-repeat; position: absolute; bottom: -2px; left: 155px; } input::placeholder { padding-left: 10px !important; } .learn-more:hover { text-decoration: underline; } form { display: flex; justify-content: center; position: relative; } input::placeholder { font-family: Inter; font-weight: 400; font-size: 16px; line-height: 29.3px; letter-spacing: 0%; color: #7E7E7E; padding-left: 50px; } .test-img{display: flex; justify-content: center;} .tryit-email { width: 600px; height: 50px; border: none !important; box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px; } .btn-toolbar .btn-tryit-free { width: auto; height: 50px; border-top-right-radius: 4px; border-bottom-right-radius: 4px; color: #FFFFFF; background-color: #FF7B1D; font-family: Inter; font-weight: 600; font-size: 16px; padding: 0 20px; border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important; } .btn-toolbar { position: absolute; right: 348px; } .contact-section { text-align: center; padding: 40px 20px; background-color: #f8f9fa; border-radius: 10px; } .team-avatars { display: flex; justify-content: center; align-items: center; gap: 10px; /* Spacing between images */ margin-bottom: 15px; } .team-avatars img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 3px solid white; } .footer-btn, .banner-btn { background-color: #ff7f2a; border: none; padding: 10px 20px; color: white; border-radius: 5px; font-size: 16px; transition: 0.3s; } .footer-btn a { color: white; } .footer-btn:hover, .banner-btn:hover { background-color: #e66a1a; } .feature-card { margin: 40px 0; } .feature-card-para { min-height: 120px; } .section-title { padding: 50px 0; } .owl-dots { display: none !important; } .banner-text { flex: 1; } .banner img { border-radius: 10px; max-width: 200px; } .frequently-section .accordion-button:not(.collapsed) { color: none !important; background-color: #ffffff !important; box-shadow: none !important; padding-bottom: 0 !important; } .frequently-section .accordion-item h2 { font-family: Inter; font-weight: 600; font-size: 18px; line-height: 1.2; letter-spacing: 0%; color: #101828; } .frequently-section .accordion-collapse .accordion-body { font-family: Inter; font-weight: 400; font-size: 14px; line-height: 24px; letter-spacing: 0%; color: #667085; width: 90%; padding-top: 0; } .accordion-item { border: none; } .frequently-section .accordion-button::after { background-image: url('/public/newweb/icon/plus-circle.png') !important; border: 1px solid #FF7B1D; border-radius: 100%; width: 21px; height: 21px; } .frequently-section .accordion-button:focus { border-color: #ffffff; } .product-list li { position: relative; } .product-list li::after { content: ""; display: block; width: 15px; height: 20px; background-image: url('/public/newweb/icon/arrow-up-right-square.png'); background-size: contain; background-repeat: no-repeat; position: absolute; bottom: 0; right: 0; } .testimonial{padding: 20px 10px;} .testimonial:hover{background-color: #f1f1f2;} .tryit-email-input::before { content: ""; display: block; width: 28.5px; height: 24px; background-image: url('/public/newweb/icon/fi-br-envelope.png'); background-size: contain; background-repeat: no-repeat; position: absolute; bottom: 50%; left: 15px; transform: translateY(50%); pointer-events: none; } .tryit-email-input { position: relative; display: inline-block; } .tryit-email:focus+.tryit-email-input::before { display: none; } .questions-section { position: relative; } .contact-section .questions-section .questions-img { width: 56px; height: 56px; border-radius: 50%; border: 3px solid #ffffff; } .mobile-trial-btn { display: none; } .product-carousel { width: 100%; height: 500px; overflow: hidden; position: relative; border-radius: 10px; } .product-carousel img { width: 100%; height: auto; position: absolute; opacity: 0; transition: opacity 0.5s ease-in-out; } .product-carousel img.active { opacity: 1; } .testimonial .summary { overflow: hidden; height: 85px !important; } .testimonial .summary p { overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; } .product-item .product-list ul li { font-size: 16px; line-height: 2; font-weight: 700; } @media (min-width: 320px) and (max-width: 767px) { .btn-toolbar .btn-tryit-free{border-radius: 20px !important;} .home-slider-img-section{display: none !important;} .home-page-main{padding: 0 5% !important;} .homepage-clients-logo{height: auto !important;} .rating-container { display: none !important; } .product-img { display: none !important; } .home-clients-section { padding-top: 40px !important; } .home-slider-section .page-slider-section .slider-main-para { margin: 0; padding: 0 !important; } .home-slider-section .page-slider-section .page-title h1 { font-size: 25px; line-height: 100%; } .home-slider-section .page-slider-section .slider-main-para p { font-size: 14px !important; line-height: 1.5 !important; text-align: center !important; } .home-slider-form { padding-top: 20px !important; } .home-page-form-sec { display: none; } .mobile-trial-btn { display: block; } .main-product-menu{padding: 10px !important;} .btn-toolbar { position: relative !important; justify-content: center; right: 0; } .feature-card-para{min-height: auto !important;} .feature-card-para h5{font-size: 14px !important; font-weight: 700;} .feature-card-para .learn-more{font-size: 14px !important; font-weight: 300 !important;} .mobile-trial-btn .btn-toolbar .btn-ohrm { width: 70% !important; height: 40px; font-size: 12px !important; padding: 0 20px !important; } .banner-section .container .row {width: auto !important;} .section-title { padding: 40px 0; } .section-title h5 { font-size: 14px !important; line-height: 1.3 !important; } .section-title h2 { font-size: 18px !important; line-height: 1.2 !important; text-align: center; } .homepage-clients-logo .container .row { height: 100px; } .product-item .product-title h3 { font-size: 18px; line-height: 100%; } .home-slider-section { padding-bottom: 40px !important; } /* product section */ .product-item .product-description p { font-size: 14px; line-height: 100%; text-align: left !important; } .product-item .product-list ul li { font-size: 16px; line-height: 100%; } .product-list li::after { width: 16px; height: 16px; } .main-product-item { padding-bottom: 0; } /* Clients Section*/ .home-clients-section { padding-bottom: 0 !important; } .testimonial p { font-size: 12px; } .testimonial img { width: 80px !important; height: 80px !important; overflow: hidden; border-radius: 50%; object-fit: cover; } .product-carousel { height: auto !important; } .home-support-section .feature-card .learn-more a { position: relative; } .home-support-section .feature-card .learn-more a::after { right: 0; left: 110px; width: 15px !important; bottom: -2px !important; } /* FAQ section*/ .questions-img-1 { left: 100px !important; } .questions-img-3 { right: 100px !important; } .section-sub-para p { font-size: 14px !important; line-height: 1.2 !important; text-align: center !important; } .accordion { padding: 10px !important; } .accordion-item .accordion-header { font-size: 16px !important; line-height: 1.5 !important; } .frequently-section .accordion-collapse .accordion-body { font-size: 14px !important; line-height: 1.2 !important; } .contact-section-menu{padding-bottom: 0 !important;} .contact-section .footer-btn{margin-top: 10px !important;} .feature-card {margin: 10px 0 !important;} .banner .banner-text h2{font-size: 16px !important; text-align: center !important;} .banner .banner-para p{text-align: center !important;} /* .carousel-control-prev, .carousel-control-next{display: none !important;} */ } @media (min-width: 768px) and (max-width: 1024px) { /*home page slider section*/ .home-slider-section .page-slider-section .page-title h1 { font-size: 45px; } .home-slider-section .page-slider-section .slider-main-para { margin: 0 100px; } .btn-toolbar { right: 0; } /* FAQ section*/ .questions-img-1 { left: 265px !important; } .questions-img-3 { right: 265px !important; } } /* Product section */ .product-img { display: flex; justify-content: center; align-items: center; overflow: hidden; width: 100%; height: 100%; max-height: 350px; } .product-img img { width: 100%; height: 100%; object-fit: contain; } hr { margin-left: 0 !important; } .main-product-item .img-right { order: 1 !important; } .rating-container { background-color: #f5f5f5; border-radius: 50px; padding: 20px; display: flex; align-items: center; justify-content: space-between; max-width: 550px; margin: 50px auto; position: relative; } .rating-block { display: flex; align-items: center; gap: 10px; z-index: 2; } .rating-block .circle { width: 40px; height: 40px; background-color: #f9c9c9; border-radius: 50%; } .rating-block .stars { color: #f8b400; font-size: 1.3rem; } .rating-block .rating-text { font-weight: bold; color: #333; } .rating-text span { font-weight: normal; color: #777; } .gradient-bg { position: absolute; left: 27.5%; width: 45%; height: 75%; background: linear-gradient(to right, #ff9900, #ff6600); border-radius: 50px; z-index: 1; display: flex; justify-content: space-around; align-items: center; overflow: hidden; } .gradient-bg .cutout { width: 50px; height: 50px; background-color: white; border-radius: 50%; z-index: 3; display: flex; justify-content: center; align-items: center; } .carousel-item>.row { display: flex; } .carousel-item img { width: 100%; height: auto; } .carousel img { width: 70px; border-radius: 50%; margin-right: 1rem; overflow: hidden; } .carousel-inner { padding: 1em; } @media screen and (min-width: 576px) { .carousel-inner { display: flex !important; width: 90% !important; margin-inline: auto !important; padding: 1em 0 !important; overflow: hidden !important; } .carousel-item { display: block !important; margin-right: 0 !important; flex: 0 0 calc(100% / 2) !important; } } @media screen and (min-width: 768px) { .carousel-item { display: block !important; margin-right: 0 !important; flex: 0 0 calc(100% / 3) !important; } } @media screen and (max-width: 575px) { .carousel-inner { display: block !important; overflow: hidden; } .carousel-item { display: block !important; width: 100% !important; flex: 0 0 100% !important; } } .carousel .card { margin: 0 0.5em; border: 0; } .carousel-control-prev, .carousel-control-next { width: 3rem; height: 3rem; background-color: grey; border-radius: 50%; top: 50%; transform: translateY(-50%); } Streamline All Your HR Needs on One Intuitive Platform OrangeHRM is a flexible, all in one HR software that helps businesses of all sizes manage their people, streamline HR processes, and drive growth. From employee management to recruitment and onboarding, performance management and leave management, our HRMS platform makes it easier to keep your workforce productive and engaged. Join Over 5 Million Users Who Trust OrangeHRM as Their Trusted HR Software Partner ‹› Consolidate Your HR Processes into One Smart Platform People Management Managing the daily demands of HR, from resolving immediate challenges to overseeing extensive paperwork, can be significant. By implementing a strong people management strategy backed by HR software to automate your processes, you can equip your team with the necessary resources to thrive. HR Administration Employee Management Reporting and Analytics Mobile App Talent Management A thriving company culture depends on a recruitment team that ensures every hire aligns with its values and vision. Beyond creating a positive candidate experience, they require a comprehensive HRMS that integrates a robust applicant tracking system and an automated, world-class onboarding experience to ensure your new employees are ready before they even step through the door. Recruitment Onboarding Request Desk Compensation Eliminate the complexity of manually managing leave management, time and attendance tracking, and employee scheduling. With OrangeHRM's HRMS platform, you can automate these processes, reduce manual errors, and keep data flowing seamlessly across HR. This lets you focus on strategic HR initiatives and building a more productive workplace, instead of getting bogged down by administrative tasks. Leave Management Time and Attendance Roster Culture Your commitment to developing your people fosters a thriving company culture where employees feel valued and more engaged. By leveraging HR software to actively manage performance, support career development, and provide effective training, you empower your team to grow, enabling you to recognize challenges and celebrate successes. Performance Management Career Development Training Surveys Employee Voice Discipline White Glove Implementation and Exceptional Support Flexible hosting options to suit your needs! Learn More Ongoing support wherever you are located! Learn More Connect OrangeHRM to Your Existing Tech Stack Let OrangeHRM serve as the hub of your HR technology ecosystem. Connect your existing tech stack to OrangeHRM to streamline processes, improve accuracy, and scale rapidly. Explore Connectors What Our Clients Say OrangeHRM is a project we're taking very seriously as it's a very exciting and important change for us to move to this system. I can see that OrangeHRM takes their work in transitioning clients as seriously as we are taking in making the transition to your application. As mentioned, we'd considered ADP and a few other applications in an evaluation process and thanks to your good work and patience and in the apparent friendly user interface and customizeability of your system, the decision became very easy to make the change. Maria Glezos Director of HR, Benefits & Administration OrangeHRM has provided our small non-profit with the ability to seamlessly onboard, train and maintain employee information in our field, without using multiple spreadsheets. This customizable system is easy to learn and utilize, and the customer service team far surpasses others software systems currently used. OrangeHRM is highly recommended by Affinity. Stephanie Callan Director of Administration We chose OrangeHRM due to the flexibility they offer, especially within our industry. OrangeHRM offers a flexible solution, and people. They understood what challenges we faced, and offered a solution that could fit with our organization, and not the other way round, which many other suppliers do. OrangeHRM has made it easy for us to choose what modules we felt were needed at specific times. We are really excited to watch how we progress even more, and see what the future holds. Guillermo Cogorno HR Director There has been a significant improvement in our ability to track important information regarding leave ever since we started using this system in 2022. I have found the system to be user friendly both as an Administrator and end user. It gives our team a sense of ownership in the management of their leave and personal details as they can track leave and update their personal details. Dawn Lambert Human Resource and Training Manager OrangeHRM has everything a HR department needs to function to its fullest potential in just one system. Representatives of OrangeHRM are willing to spend time, build things up and provide demonstrations before commitment, which were amazing and very informative. My experience with OrangeHRM is certainly positive and beneficial for my work! Andreas Tziarras Managing Director Implementing OrangeHRM has been a game-changer for our organization. As a remote company with a dynamic workforce, we needed a robust HR management system that could streamline our HR processes and improve overall efficiency. OrangeHRM has significantly enhanced our HR operations, allowing us to focus more on strategic initiatives and less on administrative tasks. Its comprehensive features, ease of use, and excellent support make it an indispensable tool for any organization looking to optimize its HR processes. We highly recommend OrangeHRM to any company seeking a reliable and scalable HR management solution. Earl Dela Torre HR Manager OrangeHRM has significantly streamlined HR administration for our small software company. As the HR manager, I've found the Leave Absence feature particularly useful. Its user-friendly interface allows employees to easily submit leave requests, and the automatic system updates eliminate the need for manual paperwork and follow-ups. Hassaan Ahmad CFO We needed a system able to capture this diversity, highly customizable and easy to use at the same time, a unique combination of complexity and simplicity. We were also looking for a solution that would give us flexibility to have a gradual, step-by-step implementation process, allowing us to move at our own pace. And we found all of that in OrangeHRM! Irina Rogozhina European HR Generalist Some years ago, we embarked on a detailed and comprehensive analysis of the Market to identify an HR Management system that would fully meet our Organizational requirements and allow us to prioritize and streamline our business processes. We recognized OrangeHRM as being the best solution for us. The key factors in our decision-making process were the functionality offered by the product, a user-friendly and intuitive interface, language translation and of course pricing. Fabian Di Gregorio Finance/Human Resources Regional Manager OrangeHRM is a project we're taking very seriously as it's a very exciting and important change for us to move to this system. I can see that OrangeHRM takes their work in transitioning clients as seriously as we are taking in making the transition to your application. As mentioned, we'd considered ADP and a few other applications in an evaluation process and thanks to your good work and patience and in the apparent friendly user interface and customizeability of your system, the decision became very easy to make the change. Maria Glezos Director of HR, Benefits & Administration OrangeHRM has provided our small non-profit with the ability to seamlessly onboard, train and maintain employee information in our field, without using multiple spreadsheets. This customizable system is easy to learn and utilize, and the customer service team far surpasses others software systems currently used. OrangeHRM is highly recommended by Affinity. Stephanie Callan Director of Administration We chose OrangeHRM due to the flexibility they offer, especially within our industry. OrangeHRM offers a flexible solution, and people. They understood what challenges we faced, and offered a solution that could fit with our organization, and not the other way round, which many other suppliers do. OrangeHRM has made it easy for us to choose what modules we felt were needed at specific times. We are really excited to watch how we progress even more, and see what the future holds. Guillermo Cogorno HR Director There has been a significant improvement in our ability to track important information regarding leave ever since we started using this system in 2022. I have found the system to be user friendly both as an Administrator and end user. It gives our team a sense of ownership in the management of their leave and personal details as they can track leave and update their personal details. Dawn Lambert Human Resource and Training Manager OrangeHRM has everything a HR department needs to function to its fullest potential in just one system. Representatives of OrangeHRM are willing to spend time, build things up and provide demonstrations before commitment, which were amazing and very informative. My experience with OrangeHRM is certainly positive and beneficial for my work! Andreas Tziarras Managing Director Implementing OrangeHRM has been a game-changer for our organization. As a remote company with a dynamic workforce, we needed a robust HR management system that could streamline our HR processes and improve overall efficiency. OrangeHRM has significantly enhanced our HR operations, allowing us to focus more on strategic initiatives and less on administrative tasks. Its comprehensive features, ease of use, and excellent support make it an indispensable tool for any organization looking to optimize its HR processes. We highly recommend OrangeHRM to any company seeking a reliable and scalable HR management solution. Earl Dela Torre HR Manager OrangeHRM has significantly streamlined HR administration for our small software company. As the HR manager, I've found the Leave Absence feature particularly useful. Its user-friendly interface allows employees to easily submit leave requests, and the automatic system updates eliminate the need for manual paperwork and follow-ups. Hassaan Ahmad CFO We needed a system able to capture this diversity, highly customizable and easy to use at the same time, a unique combination of complexity and simplicity. We were also looking for a solution that would give us flexibility to have a gradual, step-by-step implementation process, allowing us to move at our own pace. And we found all of that in OrangeHRM! Irina Rogozhina European HR Generalist Some years ago, we embarked on a detailed and comprehensive analysis of the Market to identify an HR Management system that would fully meet our Organizational requirements and allow us to prioritize and streamline our business processes. We recognized OrangeHRM as being the best solution for us. The key factors in our decision-making process were the functionality offered by the product, a user-friendly and intuitive interface, language translation and of course pricing. Fabian Di Gregorio Finance/Human Resources Regional Manager OrangeHRM is a project we're taking very seriously as it's a very exciting and important change for us to move to this system. I can see that OrangeHRM takes their work in transitioning clients as seriously as we are taking in making the transition to your application. As mentioned, we'd considered ADP and a few other applications in an evaluation process and thanks to your good work and patience and in the apparent friendly user interface and customizeability of your system, the decision became very easy to make the change. Maria Glezos Director of HR, Benefits & Administration ‹› Frequently Asked Questions Everything you need to know about OrangeHRM Does OrangeHRM offer a free version? Yes! The OrangeHRM Starter is our free, open-source version designed for small businesses looking to automate HR tasks like employee management, leave tracking, and reporting. Is there a free trial? Yes, OrangeHRM Advanced offers a 30-day free trial, allowing businesses to explore premium features in our HRMS, such as recruitment, performance management, and payroll integration, before committing to a plan. What is the difference between the OrangeHRM Starter and Advanced? The Starter is free and open-source, while Advanced is a paid, feature-rich subscription with modules like recruitment, performance management, and payroll integration. Is OrangeHRM cloud-based or on-premise? Both. OrangeHRM supports cloud-hosted and on-premise deployments, giving businesses flexibility over their data and infrastructure. How is OrangeHRM priced? Pricing is modular you only pay for the modules you need, and you can add more as your business grows. What systems does OrangeHRM integrate with? OrangeHRM connects with a range of third-party apps, including payroll, collaboration, and productivity tools. Can I upgrade from the free version to Advanced? Yes. You can start with the free Starter plan and upgrade to the Advanced plan when your needs grow. How do I get started with OrangeHRM? You can sign up for the free Starter plan or start a 30-day free trial of the Advanced plan, no credit card required. How long does it take to implement OrangeHRM? Implementation time varies by company size and selected modules, but OrangeHRM offers white-glove onboarding support to guide you through the process. How does OrangeHRM protect my employee data? OrangeHRM follows a strict Data Security Promise and complies with data protection frameworks including DPF privacy policies. Is OrangeHRM GDPR compliant? Yes. OrangeHRM has policies in place to support GDPR and other regional data privacy regulations. Does OrangeHRM have a mobile app? Yes. OrangeHRM has a mobile app that lets employees and managers handle HR tasks on the go. Does OrangeHRM support AI features? Yes. OrangeHRM AI offers intelligent automation for smarter HR decision-making, including predictive insights and workflow automation. Is OrangeHRM suitable for small businesses? Absolutely. The free Starter plan is specifically designed for small businesses, and the Advanced plan scales to support mid-size and enterprise organizations. Can OrangeHRM be customized for my industry? Yes. OrangeHRM offers tailored solutions for industries including healthcare, manufacturing, education, and more. Does OrangeHRM support multi-location or global teams? Yes. OrangeHRM is built to manage diverse, multi-location workforces with support for multiple languages and regional configurations. What kind of customer support does OrangeHRM provide? OrangeHRM offers ongoing support via a Help Portal, AI Help Desk, and direct customer service, regardless of your location. How do I contact OrangeHRM support for technical or general inquiries? You can reach OrangeHRM through several channels depending on your needs: General Support Hotline: Call us at +1-914-908-4886. Technical Support (Starter Edition): Email our team at ossupport@orangehrm.com. Online Help Portals: For Advanced Version articles, visit help.orangehrm.com. For Starter Version articles, visit starterhelp.orangehrm.com. Still have questions? Can’t find the answer you’re looking for? Talk to one of our product experts today! Contact Sales $(document).ready(function () { $('#Form_getForm_Email').keypress(function (e) { if (e.keyCode == 13) $('#linkadd').click(); }); }); const imgElements = document.querySelectorAll("img[data-src]"); const lazyLoadingImage = (entries, observer) => { entries.forEach((entry) => { if (!entry.isIntersecting) return; entry.target.src = entry.target.dataset.src; entry.target.addEventListener("load", () => { entry.target.classList.remove("lazy-img"); observer.unobserve(entry.target); }); }); }; const lazyLoadingObserver = new IntersectionObserver(lazyLoadingImage, { threshold: 0.9, }); imgElements.forEach((img) => lazyLoadingObserver.observe(img)); document.addEventListener("DOMContentLoaded", function () { const isMobile = window.innerWidth < 576; if (isMobile) { const items = document.querySelectorAll("#testimonialCarousel .carousel-item"); let index = 0; if (items.length > 0) { // Remove any pre-existing .active items.forEach(item => item.classList.remove("active")); // Initial active items[index].classList.add("active"); // Set interval to rotate active class every 2s setInterval(() => { // Remove active from current items[index].classList.remove("active"); // Move to next index (loop if needed) index = (index + 1) % items.length; // Add active to next item items[index].classList.add("active"); }, 2000); } } }); // For generic Owl Carousel sliders (autoplay with 5 items on desktop) $('.owl-carousel').not('.carousel-testimonial').owlCarousel({ stagePadding: 0, loop: true, margin: 10, nav: false, autoplay: true, slideTransition: 'linear', autoplayTimeout: 3000, autoplaySpeed: 3000, autoplayHoverPause: false, responsive: { 0: { items: 2 }, 600: { items: 3 }, 1000: { items: 5 } } }); // For testimonials only (no autoplay, max 3 items) $('.carousel-testimonial').owlCarousel({ loop: true, margin: 10, nav: false, autoplay: false, // Autoplay disabled responsiveClass: true, responsive: { 0: { items: 1 }, 600: { items: 2 }, 1000: { items: 3 } } }); document.getElementById('Form_submitForm').addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); document.getElementById('Form_submitForm_action_request').click(); } }); function buttonClick() { const email = document.getElementById('Form_submitForm_EmailHomePage').value; localStorage.setItem('trialEmail', email); }
+
+---
+
+## Page: Solutions
+
+**URL**: https://orangehrm.com/book-a-free-demo
+
+**Title**: Book a Free HRMS Demo | HR Software | HRMS | OrangeHRM
+
+**Meta description**: Discover how OrangeHRM can transform HR processes at your organization. Book a free demo today and experience streamlined workforce management firsthand.
+
+**Status**: success: Playwright
+
+**QA risk**: Medium (57/100)
+
+**Risk factors:**
+- 1 form(s) detected
+- 26 interactive button(s)
+- 180 navigation link(s)
+- 1 browser console error(s)
+- 3 failed network request(s)
+- 3 accessibility finding(s)
+
+**Page load**: 8552 ms
+
+**Browser console errors**: 1
+
+**Failed network requests**: 3
+
+**Accessibility findings**: 3
+
+**API/XHR responses**: 2
+
+**Summary**:
+.free-demo-slider { padding-top: 5%; } .left-panel { color: white; padding: 40px; border-top-left-radius: 10px; border-bottom-left-radius: 10px; min-height: 100%; margin-top: 2%; } .left-panel h2 { fo...
+
+**Headings**:
+- H2: Solutions
+- H2: Why OrangeHRM
+- H2: Resources
+- H2: Company
+- H2: Pricing
+- H1: Simplify HR Operations and Empower Your Team with a Complete HR Software
+- H3: We Just Need a Few Details.
+- H5: Powering HR for businesses across 100+ countries
+- H2: Consolidate Your HR Processes into One Smart Platform
+- H3: Compensation
+- H3: People Management
+- H3: Talent Management
+- H3: Culture
+- H2: Frequently Asked Questions
+- H2: What can I expect in the free demo?
+- H2: What features will I experience during the demo?
+- H2: Who will guide me through the demo?
+- H2: What are the main benefits of using OrangeHRM?
+- H4: Still have questions?
+- H5: Company
+- H5: Resources
+- H5: Policies
+- H5: Alternatives
+
+**Forms**:
+
+- Form 1: POST /book-a-free-demo/getForm — 18 fields
+  - text `FullName` (optional)
+  - email `Email` (optional)
+  - text `Contact` (optional)
+  - select `Country` (optional)
+  - text `CompanyName` (optional)
+  - text `JobTitle` (optional)
+  - select `NoOfEmployees` (optional)
+  - hidden `robot_submit` (optional)
+  - hidden `gclid` (optional)
+  - hidden `fbclid` (optional)
+  - hidden `utm_campaign` (optional)
+  - hidden `urllanding` (optional)
+  - hidden `utm_source` (optional)
+  - hidden `utm_term` (optional)
+  - hidden `utm_medium` (optional)
+  - hidden `SecurityID` (optional)
+  - textarea `g-recaptcha-response` (optional)
+  - submit `action_submitForm` (optional)
+
+**Interaction candidates**:
+- navigate: a (safe-by-default: True)
+- click: Toggle navigation (safe-by-default: False)
+- navigate: Solutions (safe-by-default: True)
+- navigate: Starter (Open Source) (safe-by-default: True)
+- navigate: Advanced (30 Day Free Trial) (safe-by-default: True)
+- navigate: Rostero NEW (safe-by-default: True)
+- navigate: Connectors (safe-by-default: True)
+- navigate: OrangeHRM AI (safe-by-default: True)
+- navigate: App Builder NEW (safe-by-default: True)
+- navigate: People Management (safe-by-default: True)
+- navigate: Talent Management (safe-by-default: True)
+- navigate: Compensation (safe-by-default: True)
+- navigate: Culture (safe-by-default: True)
+- navigate: HR Administration (safe-by-default: True)
+- navigate: Employee Management (safe-by-default: True)
+- navigate: Reporting & Analytics (safe-by-default: True)
+- navigate: Mobile App (safe-by-default: True)
+- navigate: Recruitment (safe-by-default: True)
+- navigate: Onboarding (safe-by-default: True)
+- navigate: Request Desk (safe-by-default: True)
+- navigate: Leave Management (safe-by-default: True)
+- navigate: Time and Attendance (safe-by-default: True)
+- navigate: Roster (safe-by-default: True)
+- navigate: Performance Management (safe-by-default: True)
+- navigate: Career Development (safe-by-default: True)
+- navigate: Training (safe-by-default: True)
+- navigate: Surveys (safe-by-default: True)
+- navigate: Employee Voice NEW (safe-by-default: True)
+- navigate: Discipline (safe-by-default: True)
+- navigate: Why OrangeHRM (safe-by-default: True)
+- navigate: Starter (Open Source) (safe-by-default: True)
+- navigate: Advanced (30 Day Free Trial) (safe-by-default: True)
+- navigate: Flexible Hosting (safe-by-default: True)
+- navigate: App Builder NEW (safe-by-default: True)
+- navigate: Stakeholder Solutions (safe-by-default: True)
+- navigate: Switch to
+                                                OrangeHRM (safe-by-default: True)
+- navigate: Case Studies (safe-by-default: True)
+- navigate: Testimonials (safe-by-default: True)
+- navigate: Healthcare (safe-by-default: True)
+- navigate: Manufacturing (safe-by-default: True)
+- navigate: Education (safe-by-default: True)
+- navigate: Small Businesses (safe-by-default: True)
+- navigate: Medium Businesses (safe-by-default: True)
+- navigate: HR Manager (safe-by-default: True)
+- navigate: C-Suite (safe-by-default: True)
+- navigate: Recruiter (safe-by-default: True)
+- navigate: IT Manager (safe-by-default: True)
+- navigate: HR for All (safe-by-default: True)
+- navigate: Services & Support (safe-by-default: True)
+- navigate: Customizations (safe-by-default: True)
+- navigate: Resources (safe-by-default: True)
+- navigate: Starter (Open Source) (safe-by-default: True)
+- navigate: Advanced (30 Day Free Trial) (safe-by-default: True)
+- navigate: Certification Program (safe-by-default: True)
+- navigate: App Builder NEW (safe-by-default: True)
+- navigate: eBooks (safe-by-default: True)
+- navigate: Blog (safe-by-default: True)
+- navigate: The HR Dictionary (safe-by-default: True)
+- navigate: Webinars (safe-by-default: True)
+- navigate: Starter Overview (Open Source) (safe-by-default: True)
+- navigate: Advanced Overview (Short) (safe-by-default: True)
+- navigate: Advanced Overview (Long) (safe-by-default: True)
+- navigate: OrangeHRM ROI (safe-by-default: True)
+- navigate: HR's Guide to Effective Career Development (safe-by-default: True)
+- navigate: Data Security Promise (safe-by-default: True)
+- navigate: Starter Forum (Open Source) (safe-by-default: True)
+- navigate: OrangeHRM API (safe-by-default: True)
+- navigate: Company (safe-by-default: True)
+- navigate: Starter (Open Source) (safe-by-default: True)
+- navigate: Advanced (30 Day Free Trial) (safe-by-default: True)
+- navigate: Become a Partner (safe-by-default: True)
+- navigate: App Builder NEW (safe-by-default: True)
+- navigate: About Us (safe-by-default: True)
+- navigate: Press Releases (safe-by-default: True)
+- navigate: News Articles (safe-by-default: True)
+- navigate: Careers (safe-by-default: True)
+- navigate: Contact Us (safe-by-default: True)
+- navigate: Pricing (safe-by-default: True)
+- click: Solutions (safe-by-default: False)
+- navigate: Starter (Open Source) (safe-by-default: True)
+- navigate: Advanced 30-Day Free Trial (safe-by-default: True)
+- navigate: Rostero - Scheduling Software (safe-by-default: True)
+- navigate: Connectors (safe-by-default: True)
+- navigate: OrangeHRM AI (safe-by-default: True)
+- navigate: App Builder (safe-by-default: True)
+- navigate: People Management (safe-by-default: True)
+- navigate: HR Administration (safe-by-default: True)
+- navigate: Employee Management (safe-by-default: True)
+- navigate: Reporting & Analytics (safe-by-default: True)
+- navigate: Mobile App (safe-by-default: True)
+- navigate: Talent Management (safe-by-default: True)
+- navigate: Recruitment (safe-by-default: True)
+- navigate: Onboarding (safe-by-default: True)
+- navigate: Request Desk (safe-by-default: True)
+- navigate: Compensation (safe-by-default: True)
+- navigate: Leave Management (safe-by-default: True)
+- navigate: Time and Attendance (safe-by-default: True)
+- navigate: Roster (safe-by-default: True)
+- navigate: Culture (safe-by-default: True)
+- navigate: Performance Management (safe-by-default: True)
+
+**Generated test cases**:
+
+| ID | Test case | Priority | Category |
+|---|---|---|---|
+| TC-001 | Verify form renders correctly | High | Functional |
+| TC-002 | Verify form submission | High | Functional |
+| TC-003 | Verify input controls | Medium | Accessibility |
+| TC-004 | Verify interactive buttons | Medium | Functional |
+| TC-005 | Verify navigation links | Medium | Navigation |
+| TC-006 | Verify page structure | Low | Content |
+| TC-007 | Review accessibility findings | High | Accessibility |
+| TC-008 | Investigate browser console errors | High | Reliability |
+| TC-009 | Investigate failed network requests | High | Reliability |
+
+### TC-001 — Verify form renders correctly
+**Objective:** Verify all detected form fields and submit controls are visible and usable.
+**Priority:** High  
+**Category:** Functional
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Open the page.
+2. Locate each detected form.
+3. Verify fields and submit controls are visible and enabled.
+**Expected result:** All detected controls are rendered, labeled, and usable.
+**Evidence:**
+- Detected 1 form(s)
+
+### TC-002 — Verify form submission
+**Objective:** Verify a form can be submitted with representative valid test data and reaches the expected application state.
+**Priority:** High  
+**Category:** Functional
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Open the form.
+2. Enter safe test data appropriate to each field type.
+3. Submit using an authorized test environment.
+4. Verify the resulting page or response.
+**Expected result:** The form completes successfully or presents actionable validation feedback.
+**Evidence:**
+- Detected 1 form(s) with 18 field(s)
+
+### TC-003 — Verify input controls
+**Objective:** Verify 18 detected input/select/textarea control(s) accept appropriate values and expose usable labels.
+**Priority:** Medium  
+**Category:** Accessibility
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Inspect each input control.
+2. Verify its label, placeholder, type, and state.
+3. Enter a representative value where safe.
+**Expected result:** Controls accept appropriate values and provide an understandable accessible name or label.
+**Evidence:**
+- Detected 18 input control(s)
+
+### TC-004 — Verify interactive buttons
+**Objective:** Verify 26 detected button control(s) respond correctly to authorized user interaction.
+**Priority:** Medium  
+**Category:** Functional
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Identify each button.
+2. Verify its label and enabled state.
+3. Activate it in a safe test environment.
+4. Verify the resulting state.
+**Expected result:** The button performs its intended action or provides clear feedback.
+**Evidence:**
+- Detected 26 button control(s)
+
+### TC-005 — Verify navigation links
+**Objective:** Verify 180 detected navigation link(s) resolve to intended destinations.
+**Priority:** Medium  
+**Category:** Navigation
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Open each internal link.
+2. Verify the destination loads successfully.
+3. Check for unexpected redirects or errors.
+**Expected result:** Links resolve to reachable, expected destinations.
+**Evidence:**
+- Detected 180 navigation link(s)
+
+### TC-006 — Verify page structure
+**Objective:** Verify the page exposes a meaningful heading hierarchy and section structure.
+**Priority:** Low  
+**Category:** Content
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Inspect the heading hierarchy.
+2. Check for a logical H1-to-Hn structure.
+3. Verify major content sections have meaningful labels.
+**Expected result:** The page structure is understandable and logically organized.
+**Evidence:**
+- Detected 23 heading(s)
+
+### TC-007 — Review accessibility findings
+**Objective:** Review 3 DOM-based accessibility finding(s) and confirm remediation where appropriate.
+**Priority:** High  
+**Category:** Accessibility
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Open the page.
+2. Review the flagged controls or document metadata.
+3. Verify each issue against the application's accessibility requirements.
+**Expected result:** Interactive controls and document semantics expose appropriate accessible names and structure.
+**Evidence:**
+- Captured 3 accessibility finding(s)
+
+### TC-008 — Investigate browser console errors
+**Objective:** Investigate 1 browser console error(s) captured during page load.
+**Priority:** High  
+**Category:** Reliability
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Open the page.
+2. Reproduce the load state.
+3. Inspect console errors and their source.
+4. Determine whether they affect user-visible behavior.
+**Expected result:** No unexpected application errors remain in the browser console.
+**Evidence:**
+- Captured 1 console error(s)
+
+### TC-009 — Investigate failed network requests
+**Objective:** Investigate 3 failed network request(s) captured during page load.
+**Priority:** High  
+**Category:** Reliability
+**Preconditions:**
+- Page is reachable and loaded successfully.
+**Steps:**
+1. Open the page.
+2. Inspect failed requests.
+3. Verify response status and request URL.
+4. Determine whether each failure is expected or a defect.
+**Expected result:** Critical resources and application requests complete successfully.
+**Evidence:**
+- Captured 3 failed request(s)
+
+
+**Content**:
+.free-demo-slider { padding-top: 5%; } .left-panel { color: white; padding: 40px; border-top-left-radius: 10px; border-bottom-left-radius: 10px; min-height: 100%; margin-top: 2%; } .left-panel h2 { font-family: Inter; font-weight: 300; font-size: 40px; } .left-panel ul { padding-left: 10px; } .left-panel ul li { font-family: Inter; font-weight: 500; font-size: 16px; line-height: 2; } .form-section { padding: 40px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; } .form-section h3 { font-weight: bold; margin-bottom: 30px; } input, select { border-radius: 12px; border-width: 1px; border: 1px solid #CBD5E1; padding: 10px; width: 100%; } label { font-family: Poppins; font-weight: 600; font-size: 14px; color: #090914; padding: 10px 0; } .action { width: 100% !important; border-radius: 9px; padding: 10px; background-color: #FF7B1D !important; color: #ffffff; } #Form_getForm { width: 100%; } label{display: none !important;} #Form_getForm_FullName_Holder{padding-bottom: 10px;} #Form_getForm_Country_Holder, #Form_getForm_Email_Holder, #Form_getForm_JobTitle_Holder { width: 49% !important; float: left; padding-bottom: 10px; } #Form_getForm_NoOfEmployees_Holder, #Form_getForm_Contact_Holder, #Form_getForm_CompanyName_Holder { width: 49% !important; float: right; padding-bottom: 10px; } #Form_getForm_Country, #Form_getForm_NoOfEmployees{color: #7e8079 !important;} .btn-toolbar { padding-top: 20% !important; justify-content: center; } .frequently-section .accordion-button:not(.collapsed) { color: none !important; background-color: #ffffff !important; box-shadow: none !important; } .frequently-section .accordion-item h2 { font-family: Inter; font-weight: 500; font-size: 18px; line-height: 28px; letter-spacing: 0%; color: #101828; } .frequently-section .accordion-collapse .accordion-body { font-family: Inter; font-weight: 400; font-size: 14px; line-height: 24px; letter-spacing: 0%; color: #667085; } .frequently-section .accordion-button:focus { border-color: #ffffff; } .accordion-item { border: none; } .questions-section { position: relative; } .frequently-section .accordion-button::after, .accordion-button::after { background-image: url('/public/newweb/icon/plus-circle.png') !important; border: 1px solid #FF7B1D; border-radius: 100%; width: 21px; height: 21px; } .contact-section .questions-section .questions-img { width: 56px; height: 56px; border-radius: 50%; border: 3px solid #ffffff; } .contact-section { text-align: center; padding: 40px 20px; background-color: #f8f9fa; border-radius: 10px; } .team-avatars { display: flex; justify-content: center; align-items: center; gap: 10px; /* Spacing between images */ margin-bottom: 15px; } .team-avatars img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 3px solid white; } .contact-btn { background-color: #ff7f2a; border: none; padding: 10px 20px; color: white; border-radius: 5px; font-size: 16px; transition: 0.3s; } .learn-more { position: relative; } .learn-more a { font-family: Inter; font-weight: 600; font-size: 20px; line-height: 24.2px; letter-spacing: 0%; text-align: center; color: #1C1F25; text-decoration: none; } .learn-more a::after { content: ""; display: block; width: 20px; height: 20px; background-image: url('/public/newweb/icon/arrow-down.png'); background-size: contain; background-repeat: no-repeat; position: absolute; bottom: 0; left: 135px; transform: translateX(-50%); } .privacy-policy a{color: #FF7B1D !important;} @media (min-width: 320px) and (max-width: 767px) { #Form_getForm { width: 100% !important; } #Form_getForm_Country_Holder, #Form_getForm_Email_Holder, #Form_getForm_JobTitle_Holder, #Form_getForm_NoOfEmployees_Holder, #Form_getForm_Contact_Holder, #Form_getForm_CompanyName_Holder{ width: 100% !important; } .form-section { padding: 20px 10px !important; } .privacy-policy { width: 100% !important; } #Form_getForm_Country_Holder, #Form_getForm_NoOfEmployees_Holder { width: 100% !important; padding-bottom: 20px; } .btn-toolbar { padding-top: 35% !important; } .btn-toolbar .action { width: 100% !important; } .form-section h3 { font-size: 20px !important; } .ohrm-plans-menu { margin: 0 !important; } .compare-menu{margin: 0 10px !important;} .adv-col-sub {margin: 0 25% !important;} .free-demo-header th { font-size: 12px !important; } .banner-section .banner{margin: 0 !important;} .banner-para p{padding: 10px !important;} .item-section .icon{display: none !important;} .item-section{margin: 10px 0 !important;} .overview-faq-section{padding: 0 !important;} .compare-section-title{padding-bottom: 0 !important;} .section-sub-para p{text-align: center !important; padding-top: 10px !important;} .ohrm-plans-menu-item{padding-bottom: 0 !important;} .frequently-section{padding-top: 0 !important;} .compare .accordion-header button { font-size: 14px !important; height: 10px !important; } .overview-faq-section .frequently-section .accordion{padding: 0 0 20px 0 !important;} .section-title {padding: 10px 0;} .homepage-clients-logo {height: auto !important; margin: -30px 0 !important;} .ohrm-plans .free-demo-card , .ohrm-plans .advanced{padding: 20px 20px !important;} .compare .compare-menu .accordion{padding: 10px 10px 20px 10px !important;} .overview-product-items .section-title {padding: 20px 0 !important;} .product-item .product-title h3 { font-size: 18px !important; line-height: 100% !important; } .free-demo-main-slider-menu{padding-top: 10%;} } .free-demo-card { background-color: #f8f9fa; border-radius: 12px; padding: 40px 20px; } .plan-title { font-size: 24px; font-weight: 700; } .plan-desc { font-size: 14px; color: #6c757d; padding: 10px 0 40px 0; } .feature { display: flex; align-items: center; margin-bottom: 10px; font-size: 14px; } .feature i { margin-right: 10px; } .feature.disabled { color: #adb5bd; } .btn-get-free-demo { margin-top: 30px; } .advanced { background: linear-gradient(to bottom right, #ff6a00, #ff4e50); color: #fff; border-radius: 12px; padding: 40px 20px; } .ohrm-plans-menu { margin: 0 20%; } .icon img { width: 100px !important; } .table-wrapper { background: #fff; border-radius: 15px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06); overflow: hidden; } .free-demo-header { background: linear-gradient(to right, #f3f5f8, #e6edf6); font-weight: bold; font-size: 1.2rem; text-align: center; } .starter-col { background-color: #e6f0ff; } .adv-col-sub { margin: 0 40% !important; } .sta-col { /* background: linear-gradient(180deg, #FFFFFF 0%, #ebedff 100%); */ display: flex; justify-content: center; } .check { color: #0d6efd; font-size: 1.4rem; } .check-adv { color: #fd5e53; font-size: 1.4rem; } .cross { color: #d6d6d6; font-size: 1.4rem; } .table td, .table th { vertical-align: middle; } .table td, .table th, .table thead, .table tbody { border: 1px solid rgb(255, 255, 255); } .table>:not(caption)>*>* { padding: 5px !important; box-shadow: none !important; } @media (max-width: 576px) { .table th, .table td { font-size: 0.85rem; padding: 0.75rem; } h2 { font-size: 1.5rem; } } .accordion-button:not(.collapsed) { background-color: #FFFFFF; } .accordion-button:focus { box-shadow: none; } .accordion-button:not(.collapsed) { background-color: transparent; border: none; box-shadow: none; } .accordion-item { border: none; } .compare-menu{margin: 0 16%;} .compare .accordion-header button{font-size: 20px; font-weight: 900; color: #101828;} .free-demo-header th{font-size: 16px; color: #101828;} tr td{ font-size: 14px; color: #191D23;} input, select, textarea { border-radius: 12px; border-width: 1px; border: 1px solid #CBD5E1; padding: 10px; width: 100%; } Simplify HR Operations and Empower Your Team with a Complete HR Software We Just Need a Few Details. Full Name Email Phone Number Country Country Afghanistan Albania Algeria American Samoa Andorra Angola Anguilla Antigua and Barbuda Argentina Armenia Aruba Australia Austria Azerbaijan Bahamas Bahrain Bangladesh Barbados Belarus Belgium Belize Benin Bermuda Bhutan Bolivia Bosnia and Herzegowina Botswana Bouvet Island Brazil Brunei Darussalam Bulgaria Burkina Faso Burundi Cambodia Cameroon Canada Cape Verde Cayman Islands Central African Republic Chad Chile China Christmas Island Cocos (Keeling) Islands Colombia Comoros Congo Cook Islands Costa Rica Cote D'Ivoire Croatia Cuba Cyprus Czech Republic Denmark Djibouti Dominica Dominican Republic East Timor Ecuador Egypt El Salvador Equatorial Guinea Eritrea Estonia Ethiopia Falkland Islands (Malvinas) Faroe Islands Fiji Finland France French Guiana French Polynesia French Southern Territories Gabon Gambia Georgia Germany Ghana Gibraltar Greece Greenland Grenada Guadeloupe Guam Guatemala Guinea Guinea-bissau Guyana Haiti Heard and Mc Donald Islands Honduras Hong Kong Hungary Iceland India Indonesia Iran Iraq Ireland Israel Italy Jamaica Japan Jordan Kazakhstan Kenya Kiribati North Korea South Korea Kuwait Kyrgyzstan Laos Latvia Lebanon Lesotho Liberia Libya Liechtenstein Lithuania Luxembourg Macau Macedonia Madagascar Malawi Malaysia Maldives Mali Malta Marshall Islands Martinique Mauritania Mauritius Mayotte Mexico Moldova Monaco Montenegro Mongolia Morocco Mozambique Myanmar Namibia Nauru Nepal Netherlands Netherlands Antilles New Caledonia New Zealand Nicaragua Niger Nigeria Niue Norfolk Island Northern Mariana Islands Norway Oman Pakistan Palau Panama Papua New Guinea Paraguay Peru Philippines Poland Portugal Puerto Rico Qatar Reunion Romania Russian Federation Rwanda St Kitts and Nevis St Lucia St Vincent and the Grenadines Samoa San Marino Sao Tome and Principe Saudi Arabia Senegal Serbia Seychelles Sierra Leone Singapore Slovakia Slovenia Solomon Islands Somalia South Africa South Georgia Spain Sri Lanka Sudan Suriname Swaziland Sweden Switzerland Syrian Arab Republic Taiwan Tajikistan Tanzania Thailand Togo Tokelau Tonga Trinidad and Tobago Tunisia Turkey Turkmenistan Turks and Caicos Islands Tuvalu Uganda Ukraine United Arab Emirates United Kingdom United States Uruguay Uzbekistan Vanuatu Venezuela Vietnam Virgin Islands Western Sahara Yemen Zambia Zimbabwe South Sandwich Islands St Helena St Pierre and Miquelon Vatican City Wallis and Futuna Islands Zaire Company Name Job title No Of Employees Number of Employees < 10 11 - 50 51 - 200 200 - 1,000 > 1,000 <p>You must enable JavaScript to submit this form</p> We respect your privacy. By submitting, you agree to your information being processed according to our Privacy Policy. Powering HR for businesses across 100+ countries ‹› Consolidate Your HR Processes into One Smart Platform Compensation Eliminate the complexity of manually managing leave management, time and attendance tracking, and employee scheduling. With a comprehensive HRMS, you can automate these processes, reduce manual errors, and ensure that all your data flows effortlessly across your HR department. This lets you focus on strategic HR initiatives and building a more productive workplace, instead of getting bogged down by administrative tasks. Leave Management Time and Attendance Roster People Management The demands of HR, from managing daily challenges to overseeing extensive paperwork, can be significant. With a strong people management strategy backed by automating your HR processes, you can equip your team with the necessary resources to thrive. HR Administration Employee Management Reporting and Analytics Mobile App Talent Management A thriving company culture depends on a recruitment team that ensures every hire aligns with its values and vision. Beyond creating a positive candidate experience they require a robust applicant tracking system and the ability to offer an automated, world-class onboarding experience to ensure your new employees are ready before they even step through the door. Recruitment Onboarding Request Desk Culture Your commitment to developing your people fosters a thriving company culture where employees feel valued and are more engaged. By actively managing performance, supporting career development, and providing effective training, you empower your team to grow, enabling you to recognize challenges and celebrate successes. Performance Management Career Development Training Surveys Employee Voice Frequently Asked Questions Everything you need to know about OrangeHRM What can I expect in the free demo? The free demo allows you to evaluate OrangeHRM without any financial commitment. It is an opportunity to see if the platform aligns with your specific needs and expectations before you make a purchasing decision. What features will I experience during the demo? The free demo provides a hands-on look at the transformative HR features of OrangeHRM. This includes key areas such as employee data management, performance evaluation, and other core functionalities. Who will guide me through the demo? Our team of experts will collaborate closely with you during the demo. They will work to tailor the experience and the OrangeHRM platform itself to meet your unique organizational needs. What are the main benefits of using OrangeHRM? By using the OrangeHRM platform, you can experience a number of benefits, including time saved on HR tasks, increased efficiency for your HR team, and an improved overall employee experience. Still have questions? Can’t find the answer you’re looking for? Talk to one of our product experts today! Book a Free Demo function scrollToSection(id) { const section = document.getElementById(id); const headerOffset = 10; const elementPosition = section.getBoundingClientRect().top; const offsetPosition = elementPosition + window.pageYOffset - headerOffset; window.scrollTo({ top: offsetPosition, behavior: 'smooth' }); } $('.owl-carousel').owlCarousel({ stagePadding: 0, loop: true, margin: 10, nav: false, autoplay: true, slideTransition: 'linear', autoplayTimeout: 3000, autoplaySpeed: 3000, autoplayHoverPause: false, responsive: { 0: { items: 2 }, 600: { items: 3 }, 1000: { items: 5 } } })
+
+---
+

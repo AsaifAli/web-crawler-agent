@@ -1,0 +1,46 @@
+services:
+  litellm:
+    image: litellm/litellm:1.94.0
+    container_name: web-crawler-litellm
+    command: ["--config", "/app/config.yaml", "--port", "4000"]
+    environment:
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      OPENROUTER_LITELLM_MODEL: ${OPENROUTER_LITELLM_MODEL:-openrouter/free}
+      GEMINI_LITELLM_MODEL: ${GEMINI_LITELLM_MODEL:-gemini/gemini-flash-lite-latest}
+    volumes:
+      - ./litellm_config.yaml:/app/config.yaml:ro
+    restart: unless-stopped
+
+  app:
+    build: .
+    ports:
+      - "8505:8501"
+    environment:
+      LLM_GATEWAY_ENABLED: ${LLM_GATEWAY_ENABLED:-false}
+      LLM_GATEWAY_URL: ${LLM_GATEWAY_URL:-http://litellm:4000/v1}
+      LLM_GATEWAY_API_KEY: ${LITELLM_MASTER_KEY:-}
+      LLM_GATEWAY_MODEL: ${LLM_GATEWAY_MODEL:-portfolio-free}
+      USE_OLLAMA_FALLBACK: ${USE_OLLAMA_FALLBACK:-false}
+      OLLAMA_URL: ${OLLAMA_URL:-}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-}
+      CRAWLER_OUTPUT_DIR: /app/output
+    volumes:
+      - ./output:/app/output
+    depends_on:
+      litellm:
+        condition: service_started
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    profiles: ["ollama"]
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    restart: unless-stopped
+
+volumes:
+  ollama-data:

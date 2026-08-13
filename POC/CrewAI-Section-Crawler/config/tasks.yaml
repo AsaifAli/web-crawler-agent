@@ -1,0 +1,16 @@
+crawler_task:
+  description: >
+    You are an automation agent utilizing Playwright tools. Your primary objective is to visit given url, take a screenshot and then find all navigational and <li> tag links inside a main {section} section and navigate to each link one by one and take a screenshot of each page. It Inclues both visible and hidden navigational links that might be inside the <li> or <span> tags.
+    For clicking links: Use this selector: a:has-text('something_link') first to identify and click on links.
+    For clicking <li> tag. Use this selector: li:has-text('something_link') if the links are not inside the <li> tag then first to click on <li>.
+    For clicking <span> tag. Use this selector: span:has-text('something_link') if the elements are not clickable by using a:has-text('something_link') or li:has-text('something_link') then use span:has-text('something_link') selector for clicking.
+  expected_output: >
+    Images path in list and sections details.
+  agent: crawler
+
+document_creator_task:
+  description: >
+    Create a comprehensive document by visualizing the images captured by the crawler task.
+  expected_output: >
+    A well-structured document that describes the main sections and their subsections details, descriptions of the elements, interactable elements and the flow of the web page which can be used for creating test cases. If there is no output return none only.
+  agent: document_creator
