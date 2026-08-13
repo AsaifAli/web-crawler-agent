@@ -1,4 +1,4 @@
-# Web Crawler Agent
+# WebQA Intelligence — AI-Assisted Testing
 
 A Streamlit web-crawling and QA-analysis application built around Playwright.
 It crawls same-domain pages, optionally authenticates, extracts structured DOM
