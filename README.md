@@ -1,4 +1,4 @@
-# WebQA Intelligence — AI-Assisted Testing
+# Web Crawler Agent
 
 A Streamlit web-crawling and QA-analysis application built around Playwright.
 It crawls same-domain pages, optionally authenticates, extracts structured DOM
@@ -8,16 +8,6 @@ plans, and exports Markdown, HTML, DOCX, JSON, and CSV results.
 The production application intentionally **does not use vision/screenshot
 analysis**. The useful ideas from the older POCs were refactored into the main
 Playwright pipeline instead of adding multiple crawler frameworks.
-
-## 🚀 Deployment
-
-**Status:** Deployed
-
-The application is deployed as a public portfolio demonstration.
-
-**Architecture:** GitHub Actions → Docker → Cloud deployment
-
-> Live demo access is provided selectively for evaluation/interviews.
 
 ## What the main app now does
 

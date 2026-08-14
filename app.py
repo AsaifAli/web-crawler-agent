@@ -229,8 +229,8 @@ with st.sidebar:
     # Local development can keep using the LiteLLM gateway. Cloud deployments
     # can bypass it and call any OpenAI-compatible endpoint directly (for
     # example OpenRouter) by setting OPENAI_BASE_URL / OPENAI_API_KEY.
-    gateway_url = os.getenv("LLM_GATEWAY_URL", "")
-    gateway_key = os.getenv("LLM_GATEWAY_API_KEY", "")
+    gateway_url = os.getenv("LLM_BASE_URL", "") or os.getenv("LLM_GATEWAY_URL", "")
+    gateway_key = os.getenv("LLM_API_KEY", "") or os.getenv("LLM_GATEWAY_API_KEY", "")
     direct_url = os.getenv("OPENAI_BASE_URL", "")
     direct_key = os.getenv("OPENAI_API_KEY", "")
     gateway_enabled = (
@@ -249,7 +249,8 @@ with st.sidebar:
         llm_base_url = gateway_url or direct_url or "https://openrouter.ai/api/v1"
         llm_api_key = gateway_key or direct_key
         llm_model = (
-            os.getenv("LLM_GATEWAY_MODEL", "")
+            os.getenv("LLM_MODEL", "")
+            or os.getenv("LLM_GATEWAY_MODEL", "")
             or os.getenv("OPENAI_MODEL", "")
             or os.getenv("OPENAI_MODEL_ID", "")
             or "openrouter/free"
