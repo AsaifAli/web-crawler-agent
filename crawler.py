@@ -581,7 +581,7 @@ class WebCrawler:
             )
             prompt = prompt[:4000].rsplit(" ", 1)[0] + "..." if len(prompt) > 4000 else prompt
             payload = {
-                "model": self.llm_model,
+                **({"model": self.llm_model} if self.llm_model else {}),
                 "messages": [
                     {"role": "system", "content": "Summarize only the supplied webpage content."},
                     {"role": "user", "content": prompt},
