@@ -581,7 +581,7 @@ class WebCrawler:
             )
             prompt = prompt[:4000].rsplit(" ", 1)[0] + "..." if len(prompt) > 4000 else prompt
             payload = {
-                **({"model": self.llm_model} if self.llm_model else {}),
+                "model": self.llm_model,
                 "messages": [
                     {"role": "system", "content": "Summarize only the supplied webpage content."},
                     {"role": "user", "content": prompt},
@@ -678,9 +678,11 @@ class WebCrawler:
             page.on("console", on_console)
             page.on("requestfailed", on_request_failed)
             page.on("response", on_response)
-            await page.goto(url, wait_until="networkidle", timeout=30000)
-            await page.wait_for_load_state('domcontentloaded', timeout=15000)
-            await page.wait_for_timeout(1000)
+            await page.goto(url, wait_until="domcontentloaded", timeout=30000)
+            # Do not wait for networkidle: modern apps can keep background sockets,
+            # polling, analytics, or long-lived requests open indefinitely. Playwright
+            # recommends relying on explicit readiness/DOM assertions instead.
+            await page.wait_for_timeout(500)
             # If credentials were supplied and this page still exposes a
             # password field, attempt the generic login flow for this page.
             if self.username and self.password:
@@ -772,7 +774,8 @@ class WebCrawler:
                 )
                 if parsed.query:
                     target_goto_url += f"?{parsed.query}"
-            await page.goto(target_goto_url, wait_until="networkidle", timeout=60000)
+            await page.goto(target_goto_url, wait_until="domcontentloaded", timeout=30000)
+            await page.wait_for_timeout(500)
             final_url = page.url.rstrip('/')
             if final_url != normalized_url and urlparse(final_url).path != urlparse(normalized_url).path:
                 if final_url in self.visited_urls:
@@ -820,7 +823,8 @@ class WebCrawler:
                 context = await browser.new_context(viewport={'width': 1460, 'height': 1080}, ignore_https_errors=True)
                 await context.add_init_script("() => { Object.defineProperty(navigator, 'webdriver', { get: () => undefined }) }")
                 page = await self.create_page(context)
-                await page.goto(self.url, wait_until="networkidle", timeout=60000)
+                await page.goto(self.url, wait_until="domcontentloaded", timeout=30000)
+                await page.wait_for_timeout(500)
                 login_success = await self.attempt_login(page)
                 # Do not redirect to a site-specific dashboard. Continue from
                 # the supplied start URL after authentication succeeds.
