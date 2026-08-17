@@ -213,6 +213,17 @@ if "history" not in st.session_state:
 if "execution_results" not in st.session_state:
     st.session_state.execution_results = []
 
+# Portfolio handoff: the portfolio passes a short-lived gateway JWT when this
+# app is launched from a portfolio project page. Capture it once into the
+# Streamlit session and remove it from the visible URL.
+portfolio_token = str(st.query_params.get("portfolio_llm_session", "")).strip()
+if portfolio_token:
+    st.session_state.llm_gateway_session_token = portfolio_token
+    try:
+        del st.query_params["portfolio_llm_session"]
+    except Exception:
+        pass
+
 # --- Header -------------------------------------------------------------
 
 st.title(":material/travel_explore: Web crawler", anchor=False)
