@@ -16,6 +16,11 @@ load_dotenv()
 
 st.set_page_config(page_title="Web crawler", page_icon=":material/travel_explore:", layout="wide")
 
+# Shared premium visual layer (presentation-only).
+from ui_theme import apply_theme
+apply_theme()
+
+
 st.html("""
 <style>
 @keyframes fadeInUp {
