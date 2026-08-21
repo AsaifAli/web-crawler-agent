@@ -494,8 +494,19 @@ if result:
         )
         st.bar_chart(chart_data, width="stretch", height=160, color=["#22C55E"])
 
+    # Track the results tab so actions inside a tab can programmatically return
+    # the user to the relevant workspace after a rerun. Streamlit supports
+    # stateful tabs when a key and on_change callback are provided.
+    results_tab_key = "webqa_results_tabs"
+    desired_tab = st.session_state.pop("webqa_desired_tab", None)
+    if desired_tab in {"Pages", "QA plan", "Execution", "Regression", "Report", "Export"}:
+        st.session_state[results_tab_key] = desired_tab
+
     tab_pages, tab_qa, tab_execution, tab_regression, tab_report, tab_export = st.tabs(
-        [":material/web: Pages", ":material/bug_report: QA plan", ":material/play_circle: Execution", ":material/compare_arrows: Regression", ":material/article: Report", ":material/download: Export"]
+        [":material/web: Pages", ":material/bug_report: QA plan", ":material/play_circle: Execution", ":material/compare_arrows: Regression", ":material/article: Report", ":material/download: Export"],
+        default="Pages",
+        key=results_tab_key,
+        on_change="rerun",
     )
 
     with tab_pages:
@@ -658,10 +669,16 @@ if result:
                     unsafe_allow_html=True,
                 )
 
+            pending_execution = st.session_state.pop("webqa_pending_execution", None)
             if run_clicked:
-                # Stay on the Execution tab after the action and render the live results
-                # in the same Streamlit run. A rerun here can reset st.tabs() to the
-                # first tab, which makes it look like the execution view disappeared.
+                # Streamlit tab selection is stateful when a key is provided. Stage
+                # the desired tab and the exact test cases, then rerun. On the next
+                # run the Execution tab is selected before the browser checks start.
+                st.session_state["webqa_pending_execution"] = chosen
+                st.session_state["webqa_desired_tab"] = "Execution"
+                st.rerun()
+
+            if pending_execution:
                 st.html(
                     """<div id=\"qa-execution-live\" style=\"display:flex;align-items:center;gap:.6rem;padding:.72rem .9rem;margin:.7rem 0 1rem;border:1px solid rgba(34,197,94,.28);background:rgba(34,197,94,.08);border-radius:12px;\">"
                     <span style=\"width:9px;height:9px;border-radius:999px;background:#22c55e;box-shadow:0 0 0 5px rgba(34,197,94,.12);animation:dotPulse 1.1s ease-in-out infinite;\"></span>"
@@ -671,10 +688,10 @@ if result:
                 )
                 crawler = WebCrawler(url=summary["base_url"], app_id="qa_execution", output_dir=OUTPUT_DIR)
                 status = st.status("Running safe QA checks…", expanded=True)
-                status.write(f"Executing {len(chosen)} selected checks with Playwright")
+                status.write(f"Executing {len(pending_execution)} selected checks with Playwright")
                 with status:
                     st.session_state.execution_results = asyncio.run(
-                        crawler.execute_safe_qa_tests(chosen, headless=True, max_tests=len(chosen))
+                        crawler.execute_safe_qa_tests(pending_execution, headless=True, max_tests=len(pending_execution))
                     )
                 status.update(label="Safe QA execution complete", state="complete")
                 st.toast("Safe QA execution complete", icon=":material/task_alt:")
