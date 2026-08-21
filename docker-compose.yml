@@ -26,6 +26,9 @@ services:
       OLLAMA_URL: ${OLLAMA_URL:-}
       OLLAMA_MODEL: ${OLLAMA_MODEL:-}
       CRAWLER_OUTPUT_DIR: /app/output
+      CRAWLER_CONCURRENCY: ${CRAWLER_CONCURRENCY:-6}
+      CRAWLER_NAV_TIMEOUT_MS: ${CRAWLER_NAV_TIMEOUT_MS:-30000}
+      CRAWLER_SETTLE_MS: ${CRAWLER_SETTLE_MS:-100}
     volumes:
       - ./output:/app/output
     depends_on:

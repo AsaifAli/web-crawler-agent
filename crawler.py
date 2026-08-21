@@ -23,6 +23,11 @@ from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
 
+# Performance defaults. Override with environment variables for large crawls.
+DEFAULT_CRAWL_CONCURRENCY = max(1, int(os.getenv("CRAWLER_CONCURRENCY", "6")))
+DEFAULT_NAV_TIMEOUT_MS = max(5000, int(os.getenv("CRAWLER_NAV_TIMEOUT_MS", os.getenv("CRAWLER_NAVIGATION_TIMEOUT_MS", "30000"))))
+DEFAULT_SETTLE_MS = max(0, int(os.getenv("CRAWLER_SETTLE_MS", "100")))
+
 
 def retry_with_backoff(max_retries=2, base_delay=5, max_delay=60):
     def decorator(func):
@@ -234,16 +239,51 @@ class WebCrawler:
                 logger.debug(f"Error querying selector '{selector}': {e}")
 
     async def extract_page_links_playwright(self, page, base_url: str) -> list:
-        links_found = []
+        """Extract same-origin links with one browser-side DOM pass.
+
+        The previous implementation performed dozens of Playwright round trips and
+        an unnecessary full-page scroll/wait. A single evaluate is materially faster.
+        """
         if page.is_closed():
-            return links_found
+            return []
         try:
-            await page.wait_for_load_state('domcontentloaded', timeout=20000)
-            await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
-            await page.wait_for_timeout(500)
+            payload = await page.evaluate(
+                """(baseUrl) => Array.from(document.querySelectorAll(
+                    'a[href], [data-href], [data-url], [role="link"], [role="button"], nav a, nav button, menu a, menu button'
+                )).map(el => ({
+                    href: el.getAttribute('href') || el.getAttribute('data-href') || el.getAttribute('data-url'),
+                    text: (el.textContent || '').trim()
+                })).filter(x => x.href && !/^(javascript:|#|mailto:|tel:)/i.test(x.href))
+                  .map(x => ({...x, url: new URL(x.href, baseUrl).toString()}))
+            """,
+                base_url,
+            )
+            if isinstance(payload, list):
+                current_host = urlparse(page.url).netloc
+                dedup = {}
+                for item in payload:
+                    try:
+                        parsed = urlparse(item.get("url", ""))
+                        if parsed.netloc != current_host:
+                            continue
+                        normalized = parsed._replace(fragment="", query="").geturl().rstrip("/")
+                        if normalized:
+                            dedup[normalized] = {
+                                "url": normalized,
+                                "text": item.get("text") or "Link",
+                                "source": "playwright",
+                            }
+                    except Exception:
+                        continue
+                return list(dedup.values())
+        except Exception as exc:
+            logger.debug("Fast link extraction unavailable, using fallback: %s", exc)
+
+        # Compatibility fallback for tests/older Playwright wrappers.
+        links_found = []
+        try:
             link_elements = await page.query_selector_all(
-                'a[href], button[onclick], [role="link"], [role="button"], [data-href], [data-url], '
-                'nav a, nav button, menu a, menu button'
+                'a[href], button[onclick], [role="link"], [role="button"], [data-href], [data-url], nav a, nav button, menu a, menu button'
             )
             current_page_url_parsed = urlparse(page.url)
             for element in link_elements:
@@ -257,42 +297,64 @@ class WebCrawler:
                             normalized = parsed._replace(fragment="", query="").geturl().rstrip('/')
                             if normalized:
                                 links_found.append({"url": normalized, "text": text or "Link", "source": "playwright"})
-                except Exception as e:
-                    logger.debug(f"Error parsing link: {e}")
+                except Exception:
+                    continue
             return list({link['url']: link for link in links_found}.values())
-        except Exception as e:
-            logger.error(f"Error extracting links: {e}", exc_info=True)
+        except Exception as exc:
+            logger.error(f"Error extracting links: {exc}", exc_info=True)
             return []
 
     async def extract_interactive_elements(self, page) -> list:
-        """Extract controls without executing them; actions are intentionally non-destructive."""
+        """Extract controls in a single browser-side pass to minimize Playwright IPC."""
         try:
-            elements = await page.query_selector_all(
-                'input, button, select, textarea, a[href], [role="button"], [role="link"], [onclick]'
+            payload = await page.evaluate(
+                """() => Array.from(document.querySelectorAll(
+                    'input, button, select, textarea, a[href], [role="button"], [role="link"], [onclick]'
+                )).map(el => {
+                    const tag = el.tagName.toLowerCase();
+                    const type = el.getAttribute('type') || tag;
+                    return {
+                        tag,
+                        type,
+                        id: el.id || '',
+                        name: el.getAttribute('name') || '',
+                        text: (el.textContent || '').trim(),
+                        'aria-label': el.getAttribute('aria-label') || '',
+                        placeholder: el.getAttribute('placeholder') || '',
+                        required: el.hasAttribute('required'),
+                        disabled: el.hasAttribute('disabled'),
+                        role: el.getAttribute('role') || ''
+                    };
+                })"""
             )
+            if isinstance(payload, list):
+                return payload
+        except Exception as exc:
+            logger.debug("Fast interactive extraction unavailable, using fallback: %s", exc)
+
+        try:
+            elements = await page.query_selector_all('input, button, select, textarea, a[href], [role="button"], [role="link"], [onclick]')
             result = []
             for element in elements:
                 try:
                     tag = await element.evaluate('el => el.tagName.toLowerCase()')
-                    element_type = await element.get_attribute('type') or tag
-                    text = (await element.text_content() or '').strip()
                     result.append({
                         'tag': tag,
-                        'type': element_type,
+                        'type': await element.get_attribute('type') or tag,
                         'id': await element.get_attribute('id') or '',
                         'name': await element.get_attribute('name') or '',
-                        'text': text,
+                        'text': (await element.text_content() or '').strip(),
                         'aria-label': await element.get_attribute('aria-label') or '',
                         'placeholder': await element.get_attribute('placeholder') or '',
                         'required': (await element.get_attribute('required')) is not None,
                         'disabled': (await element.get_attribute('disabled')) is not None,
                         'role': await element.get_attribute('role') or '',
                     })
-                except Exception as e:
-                    logger.debug(f"Error extracting interactive element: {e}")
+                except Exception:
+                    continue
             return result
-        except Exception as e:
-            logger.error(f"Error extracting interactive elements: {e}", exc_info=True)
+        except Exception as exc:
+            logger.error(f"Error extracting interactive elements: {exc}", exc_info=True)
             return []
 
     async def extract_page_structure(self, page) -> dict:
@@ -305,6 +367,40 @@ class WebCrawler:
             "forms": [],
             "accessibility_findings": [],
         }
+        try:
+            fast = await page.evaluate(r"""() => {
+                const clean = v => (v || '').replace(/\s+/g, ' ').trim();
+                const headings = Array.from(document.querySelectorAll('h1,h2,h3,h4,h5,h6')).map(h => ({
+                    level: Number(h.tagName.substring(1)), text: clean(h.textContent)
+                })).filter(x => x.text);
+                const sections = []; const seen = new Set();
+                for (const node of document.querySelectorAll('main > section, article > section, section, article')) {
+                    const text = clean(node.textContent); if (!text || seen.has(text)) continue;
+                    seen.add(text);
+                    const h = node.querySelector('h1,h2,h3,h4,h5,h6');
+                    sections.push({heading: clean(h?.textContent), text: text.slice(0,1000), word_count: text.split(/\s+/).filter(Boolean).length});
+                    if (sections.length >= 30) break;
+                }
+                const forms = Array.from(document.querySelectorAll('form')).map((form, idx) => ({
+                    index: idx + 1, action: form.getAttribute('action') || '', method: (form.getAttribute('method') || 'get').toLowerCase(),
+                    field_count: form.querySelectorAll('input,select,textarea').length,
+                    fields: Array.from(form.querySelectorAll('input,select,textarea')).map(field => ({
+                        tag: field.tagName.toLowerCase(), type: field.getAttribute('type') || field.tagName.toLowerCase(),
+                        name: field.getAttribute('name') || '', id: field.id || '', placeholder: field.getAttribute('placeholder') || '', required: field.hasAttribute('required')
+                    })),
+                    submit_control_count: form.querySelectorAll('button[type="submit"], input[type="submit"], button:not([type])').length
+                }));
+                return {
+                    title: document.title || '',
+                    meta_description: document.querySelector('meta[name="description"]')?.getAttribute('content') || '',
+                    headings, sections, forms
+                };
+            }""")
+            if isinstance(fast, dict):
+                structure.update(fast)
+                return structure
+        except Exception as exc:
+            logger.debug("Fast DOM structure extraction unavailable, using fallback: %s", exc)
         try:
             structure["title"] = (await page.title() or "").strip()
         except Exception:
@@ -379,48 +475,56 @@ class WebCrawler:
         return structure
 
     async def assess_accessibility(self, page) -> list:
-        """Run lightweight, DOM-based accessibility checks without claiming WCAG certification."""
+        """Run lightweight DOM accessibility checks in one browser-side pass."""
+        try:
+            findings = await page.evaluate(r"""() => {
+                const out = [];
+                const title = (document.title || '').trim();
+                if (!title) out.push({severity:'Medium', rule:'page-title', message:'Page has no document title.'});
+                if (!(document.documentElement.getAttribute('lang') || '').trim()) out.push({severity:'Low', rule:'html-lang', message:'Document language is not declared.'});
+                const missingAlt = Array.from(document.images).filter(img => !img.hasAttribute('alt')).length;
+                if (missingAlt) out.push({severity:'Medium', rule:'image-alt', message:`${missingAlt} image(s) are missing alt attributes.`});
+                const controls = Array.from(document.querySelectorAll('input,select,textarea,button')).filter(c => (c.getAttribute('type') || '').toLowerCase() !== 'hidden');
+                let unlabeled = 0;
+                for (const c of controls) {
+                    const aria = (c.getAttribute('aria-label') || '').trim();
+                    const labelledby = (c.getAttribute('aria-labelledby') || '').trim();
+                    const text = (c.textContent || '').trim();
+                    const id = c.id;
+                    let has = Boolean(aria || labelledby || text);
+                    if (!has && id) has = Boolean(document.querySelector(`label[for="${CSS.escape(id)}"]`));
+                    if (!has) unlabeled++;
+                }
+                if (unlabeled) out.push({severity:'High', rule:'form-label', message:`${unlabeled} interactive control(s) have no detectable accessible name/label.`});
+                const headings = Array.from(document.querySelectorAll('h1,h2,h3,h4,h5,h6'));
+                if (!headings.length) out.push({severity:'Medium', rule:'heading-structure', message:'No semantic headings were detected.'});
+                else if (Number(headings[0].tagName.substring(1)) !== 1) out.push({severity:'Low', rule:'heading-order', message:'The first heading is not an H1.'});
+                return out.slice(0,50);
+            }""")
+            if isinstance(findings, list):
+                return findings
+        except Exception as exc:
+            logger.debug("Fast accessibility assessment unavailable, using fallback: %s", exc)
+
+        # Compatibility fallback retained for mocked/older Playwright contexts.
         findings = []
         try:
             title = (await page.title() or '').strip()
             if not title:
-                findings.append({"severity": "Medium", "rule": "page-title", "message": "Page has no document title."})
+                findings.append({"severity":"Medium","rule":"page-title","message":"Page has no document title."})
             lang = await page.get_attribute("html", "lang")
             if not lang:
-                findings.append({"severity": "Low", "rule": "html-lang", "message": "Document language is not declared."})
+                findings.append({"severity":"Low","rule":"html-lang","message":"Document language is not declared."})
             images = await page.query_selector_all("img")
             missing_alt = 0
             for image in images:
                 if (await image.get_attribute("alt")) is None:
                     missing_alt += 1
             if missing_alt:
-                findings.append({"severity": "Medium", "rule": "image-alt", "message": f"{missing_alt} image(s) are missing alt attributes."})
-            controls = await page.query_selector_all("input, select, textarea, button")
-            unlabeled = 0
-            for control in controls:
-                if await control.get_attribute("type") == "hidden":
-                    continue
-                aria = (await control.get_attribute("aria-label") or '').strip()
-                labelledby = (await control.get_attribute("aria-labelledby") or '').strip()
-                text = (await control.text_content() or '').strip()
-                cid = (await control.get_attribute("id") or '').strip()
-                has_label = bool(aria or labelledby or text)
-                if not has_label and cid:
-                    label = await page.query_selector(f'label[for="{cid}"]')
-                    has_label = label is not None
-                if not has_label:
-                    unlabeled += 1
-            if unlabeled:
-                findings.append({"severity": "High", "rule": "form-label", "message": f"{unlabeled} interactive control(s) have no detectable accessible name/label."})
-            headings = await page.query_selector_all("h1, h2, h3, h4, h5, h6")
-            levels = [int(await h.evaluate("el => el.tagName.substring(1)")) for h in headings]
-            if levels and levels[0] != 1:
-                findings.append({"severity": "Low", "rule": "heading-order", "message": "The first heading is not an H1."})
-            if not headings:
-                findings.append({"severity": "Medium", "rule": "heading-structure", "message": "No semantic headings were detected."})
+                findings.append({"severity":"Medium","rule":"image-alt","message":f"{missing_alt} image(s) are missing alt attributes."})
             return findings[:50]
         except Exception as exc:
-            logger.debug("Accessibility assessment failed: %s", exc)
+            logger.debug("Accessibility fallback failed: %s", exc)
             return findings
 
     def build_interaction_candidates(self, interactive_elements: list, forms: list) -> list:
@@ -589,7 +693,7 @@ class WebCrawler:
                 "temperature": 0.3,
                 "max_tokens": 220,
             }
-            response = requests.post(
+            response = await asyncio.to_thread(requests.post,
                 f"{self.llm_base_url.rstrip('/')}/chat/completions",
                 headers={"Authorization": f"Bearer {self.llm_api_key}"},
                 json=payload,
@@ -622,7 +726,7 @@ class WebCrawler:
                 "stream": False,
                 "options": {"max_tokens": 200, "temperature": 0.7},
             }
-            response = requests.post(self.ollama_url, json=payload, timeout=30)
+            response = await asyncio.to_thread(requests.post, self.ollama_url, json=payload, timeout=30)
             response.raise_for_status()
             result = response.json()
             summary = result.get("response", "").strip()
@@ -637,7 +741,7 @@ class WebCrawler:
             return content[:200] + "..." if content else ""
 
     @retry_with_backoff(max_retries=2, base_delay=5, max_delay=60)
-    async def scrape_page_content(self, url: str, section: str, page) -> WebpageContent:
+    async def scrape_page_content(self, url: str, section: str, page, already_loaded: bool = False) -> WebpageContent:
         logger.info(f"Scraping content for: {url}")
         content = ""
         summary = ""
@@ -678,11 +782,10 @@ class WebCrawler:
             page.on("console", on_console)
             page.on("requestfailed", on_request_failed)
             page.on("response", on_response)
-            await page.goto(url, wait_until="domcontentloaded", timeout=30000)
-            # Do not wait for networkidle: modern apps can keep background sockets,
-            # polling, analytics, or long-lived requests open indefinitely. Playwright
-            # recommends relying on explicit readiness/DOM assertions instead.
-            await page.wait_for_timeout(500)
+            if not already_loaded:
+                await page.goto(url, wait_until="domcontentloaded", timeout=DEFAULT_NAV_TIMEOUT_MS)
+                if DEFAULT_SETTLE_MS:
+                    await page.wait_for_timeout(DEFAULT_SETTLE_MS)
             # If credentials were supplied and this page still exposes a
             # password field, attempt the generic login flow for this page.
             if self.username and self.password:
@@ -774,8 +877,9 @@ class WebCrawler:
                 )
                 if parsed.query:
                     target_goto_url += f"?{parsed.query}"
-            await page.goto(target_goto_url, wait_until="domcontentloaded", timeout=30000)
-            await page.wait_for_timeout(500)
+            await page.goto(target_goto_url, wait_until="domcontentloaded", timeout=DEFAULT_NAV_TIMEOUT_MS)
+            if DEFAULT_SETTLE_MS:
+                await page.wait_for_timeout(DEFAULT_SETTLE_MS)
             final_url = page.url.rstrip('/')
             if final_url != normalized_url and urlparse(final_url).path != urlparse(normalized_url).path:
                 if final_url in self.visited_urls:
@@ -790,7 +894,7 @@ class WebCrawler:
                 self.link_collection[link['url']] = {
                     "text": link['text'], "source": link['source'], "section": inferred_section,
                 }
-            content = await self.scrape_page_content(normalized_url, inferred_section, page)
+            content = await self.scrape_page_content(normalized_url, inferred_section, page, already_loaded=True)
             self.content_collection[normalized_url] = content
             self.link_collection[normalized_url] = {
                 "text": inferred_section or "Homepage", "source": "initial", "section": inferred_section,
@@ -804,53 +908,99 @@ class WebCrawler:
             )
         return page, combined_links
 
-    async def crawl(self, max_pages=20, headless=True, progress_cb=None):
-        logger.info(f"Starting crawl for base URL: {self.url}, Max Pages: {max_pages}")
+    async def crawl(self, max_pages=20, headless=True, progress_cb=None, concurrency=None):
+        """Fast concurrent crawl using one shared authenticated browser context.
+
+        The old implementation crawled pages strictly serially and navigated each page
+        twice. This version crawls several URLs concurrently and reuses the first load.
+        """
+        logger.info("Starting fast crawl for base URL: %s, Max Pages: %s", self.url, max_pages)
         start_time = datetime.now()
-        urls_to_visit = []
+        concurrency = max(1, min(int(concurrency or DEFAULT_CRAWL_CONCURRENCY), max(1, int(max_pages))))
         initial_urls = [self.url] + [urljoin(self.url, s) for s in self.sections]
-        for u in initial_urls:
-            normalized = u.rstrip('/')
-            if normalized not in self.visited_urls:
-                urls_to_visit.append((normalized, self.section))
+        pending = []
+        scheduled = set()
+        for raw_url in initial_urls:
+            normalized = raw_url.rstrip('/')
+            if normalized not in scheduled and normalized not in self.visited_urls:
+                pending.append((normalized, self.section))
+                scheduled.add(normalized)
+
         pages_visited_count = 0
         base_domain = urlparse(self.url).netloc
         fatal_error = None
+
         async with async_playwright() as p:
-            browser, context, page = None, None, None
+            browser = None
+            context = None
             try:
                 browser = await p.chromium.launch(headless=headless)
-                context = await browser.new_context(viewport={'width': 1460, 'height': 1080}, ignore_https_errors=True)
+                context = await browser.new_context(
+                    viewport={'width': 1460, 'height': 1080},
+                    ignore_https_errors=True,
+                )
                 await context.add_init_script("() => { Object.defineProperty(navigator, 'webdriver', { get: () => undefined }) }")
-                page = await self.create_page(context)
-                await page.goto(self.url, wait_until="domcontentloaded", timeout=30000)
-                await page.wait_for_timeout(500)
-                login_success = await self.attempt_login(page)
-                # Do not redirect to a site-specific dashboard. Continue from
-                # the supplied start URL after authentication succeeds.
-                while urls_to_visit and pages_visited_count < max_pages:
-                    current_url, section = urls_to_visit.pop(0)
-                    if current_url.rstrip('/') in self.visited_urls:
-                        continue
-                    page, new_links = await self.crawl_url(context, page, current_url, base_domain, section)
-                    pages_visited_count += 1
-                    if progress_cb:
-                        progress_cb(pages_visited_count, max_pages, current_url)
-                    queued = {u[0] for u in urls_to_visit}
-                    for link_info in new_links:
-                        link_url = link_info['url'].rstrip('/')
-                        if link_url not in self.visited_urls and link_url not in queued and urlparse(link_url).netloc == base_domain:
-                            urls_to_visit.append((link_url, link_info.get('section') or section))
-            except Exception as e:
-                logger.critical(f"Fatal error during Playwright crawl: {e}", exc_info=True)
-                fatal_error = e
+
+                # Skip bytes that the crawler never inspects. Keep styles/scripts/XHR because
+                # structured DOM analysis and QA signals depend on them.
+                async def route_fast_assets(route):
+                    if route.request.resource_type in {"image", "media", "font"}:
+                        await route.abort()
+                    else:
+                        await route.continue_()
+                await context.route("**/*", route_fast_assets)
+
+                auth_page = await context.new_page()
+                await auth_page.goto(self.url, wait_until="domcontentloaded", timeout=DEFAULT_NAV_TIMEOUT_MS)
+                if DEFAULT_SETTLE_MS:
+                    await auth_page.wait_for_timeout(DEFAULT_SETTLE_MS)
+                await self.attempt_login(auth_page)
+                await auth_page.close()
+
+                async def crawl_one(item):
+                    url, section = item
+                    page = await context.new_page()
+                    try:
+                        return await self.crawl_url(context, page, url, base_domain, section)
+                    finally:
+                        if not page.is_closed():
+                            await page.close()
+
+                while pending and pages_visited_count < max_pages:
+                    batch = pending[: max_pages - pages_visited_count]
+                    pending = pending[len(batch):]
+                    results = await asyncio.gather(*(crawl_one(item) for item in batch), return_exceptions=True)
+                    pages_visited_count += len(batch)
+                    for item, result in zip(batch, results):
+                        current_url, section = item
+                        if isinstance(result, Exception):
+                            logger.error("Concurrent crawl failed for %s: %s", current_url, result, exc_info=True)
+                            self.visited_urls.add(current_url.rstrip('/'))
+                        if progress_cb:
+                            progress_cb(pages_visited_count, max_pages, current_url)
+                        if isinstance(result, tuple):
+                            _, new_links = result
+                            for link_info in new_links:
+                                link_url = link_info['url'].rstrip('/')
+                                if (
+                                    urlparse(link_url).netloc == base_domain
+                                    and link_url not in self.visited_urls
+                                    and link_url not in scheduled
+                                    and len(scheduled) < max_pages * 3
+                                ):
+                                    scheduled.add(link_url)
+                                    pending.append((link_url, link_info.get('section') or section))
+                    if pages_visited_count >= max_pages:
+                        break
+            except Exception as exc:
+                logger.critical("Fatal error during Playwright crawl: %s", exc, exc_info=True)
+                fatal_error = exc
             finally:
-                if page and not page.is_closed():
-                    await page.close()
                 if context:
                     await context.close()
                 if browser and browser.is_connected():
                     await browser.close()
+
         if fatal_error is not None:
             raise fatal_error
 
@@ -875,6 +1025,7 @@ class WebCrawler:
             "accessibility_finding_count": sum(len(c.accessibility_findings) for c in pages),
             "api_request_count": sum(len(c.api_requests) for c in pages),
             "crawl_duration": str(duration),
+            "crawl_concurrency": concurrency,
         }
         crawl_summary_path = os.path.join(self.debug_dir, f"{self.app_id}_crawl_summary_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
         with open(crawl_summary_path, 'w', encoding='utf-8') as f:
