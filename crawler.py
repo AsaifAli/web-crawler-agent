@@ -1073,20 +1073,41 @@ class WebCrawler:
             }
         return {"base_url": self.url, "pages": pages}
 
-    def compare_with_baseline(self) -> dict:
-        """Compare this crawl with the previous snapshot, if one exists."""
-        baseline_path = os.path.join(self.report_dir, f"{self.app_id}_baseline.json")
-        current = self._build_regression_snapshot()
+    def _baseline_path(self) -> str:
+        return os.path.join(self.report_dir, f"{self.app_id}_baseline.json")
+
+    def get_baseline(self) -> dict | None:
+        """Load the persistent structural baseline for this run label, if present."""
+        baseline_path = self._baseline_path()
         if not os.path.exists(baseline_path):
-            with open(baseline_path, "w", encoding="utf-8") as f:
-                json.dump(current, f, indent=2)
-            return {"available": False, "message": "Baseline created for future regression comparisons.", "added": [], "removed": [], "changed": []}
+            return None
         try:
             with open(baseline_path, "r", encoding="utf-8") as f:
-                previous = json.load(f)
+                return json.load(f)
         except (OSError, json.JSONDecodeError):
-            previous = {"pages": {}}
-        old_pages = previous.get("pages", {})
+            return None
+
+    def create_or_update_baseline(self) -> dict:
+        """Persist the current structural snapshot as the comparison baseline."""
+        current = self._build_regression_snapshot()
+        with open(self._baseline_path(), "w", encoding="utf-8") as f:
+            json.dump(current, f, indent=2)
+        return current
+
+    def compare_with_baseline(self, update_baseline: bool = False) -> dict:
+        """Compare this crawl with the stored baseline without overwriting it by default."""
+        baseline = self.get_baseline()
+        current = self._build_regression_snapshot()
+        if baseline is None:
+            self.create_or_update_baseline()
+            return {
+                "available": False,
+                "baseline_created": True,
+                "message": "Baseline created. Run another crawl to compare against it.",
+                "added": [], "removed": [], "changed": [],
+            }
+
+        old_pages = baseline.get("pages", {})
         new_pages = current.get("pages", {})
         added = sorted(set(new_pages) - set(old_pages))
         removed = sorted(set(old_pages) - set(new_pages))
@@ -1094,15 +1115,18 @@ class WebCrawler:
         for url in sorted(set(old_pages) & set(new_pages)):
             if old_pages[url] != new_pages[url]:
                 changed.append({"url": url, "before": old_pages[url], "after": new_pages[url]})
-        # Update baseline only after comparison succeeds.
-        with open(baseline_path, "w", encoding="utf-8") as f:
-            json.dump(current, f, indent=2)
+
+        if update_baseline:
+            self.create_or_update_baseline()
+
         return {
             "available": True,
-            "message": "Compared with previous crawl baseline.",
-            "added": added,
-            "removed": removed,
-            "changed": changed,
+            "baseline_created": False,
+            "baseline_updated": update_baseline,
+            "baseline_pages": len(old_pages),
+            "current_pages": len(new_pages),
+            "message": "Compared with stored baseline.",
+            "added": added, "removed": removed, "changed": changed,
         }
 
     def generate_rag_document(self):

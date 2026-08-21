@@ -124,6 +124,36 @@ div[data-testid="stFormSubmitButton"] button:hover {
 </style>
 """)
 
+st.html("""
+<style>
+.qa-suite-summary { display:flex; align-items:center; gap:8px; padding:10px 14px; border:1px solid rgba(100,120,150,.22); border-radius:12px; background:rgba(100,120,150,.06); }
+.qa-suite-dot { width:8px; height:8px; border-radius:50%; background:#14b8a6; box-shadow:0 0 0 4px rgba(20,184,166,.12); }
+.qa-section-label { margin:22px 0 10px; font-size:.72rem; letter-spacing:.18em; font-weight:800; opacity:.68; }
+.qa-result-pill { display:inline-flex; align-items:center; justify-content:center; padding:5px 10px; border-radius:999px; font-size:.72rem; font-weight:800; letter-spacing:.05em; }
+.qa-status-pass { color:#16a34a; background:rgba(22,163,74,.12); border:1px solid rgba(22,163,74,.24); }
+.qa-status-fail { color:#d97706; background:rgba(217,119,6,.12); border:1px solid rgba(217,119,6,.24); }
+.qa-status-error { color:#dc2626; background:rgba(220,38,38,.12); border:1px solid rgba(220,38,38,.24); }
+.qa-status-neutral { color:#64748b; background:rgba(100,116,139,.12); border:1px solid rgba(100,116,139,.24); }
+.qa-actual { margin:12px 0; padding:12px 14px; border-radius:10px; background:rgba(100,116,139,.06); border:1px solid rgba(100,116,139,.12); }
+.regression-hero { display:flex; justify-content:space-between; align-items:center; gap:18px; padding:20px 22px; border:1px solid rgba(20,184,166,.25); border-radius:16px; background:linear-gradient(135deg, rgba(20,184,166,.08), rgba(59,130,246,.06)); margin:8px 0 18px; }
+.regression-hero h3 { margin:.15rem 0 .3rem; }
+.regression-hero p { margin:0; opacity:.74; }
+.regression-state { white-space:nowrap; border:1px solid rgba(20,184,166,.28); color:#0f766e; background:rgba(20,184,166,.08); padding:7px 10px; border-radius:999px; font-size:.7rem; font-weight:800; letter-spacing:.08em; }
+.regression-clean,.regression-warning { display:flex; gap:10px; align-items:center; padding:12px 14px; border-radius:12px; margin:14px 0; }
+.regression-clean { border:1px solid rgba(22,163,74,.2); background:rgba(22,163,74,.08); }
+.regression-warning { border:1px solid rgba(217,119,6,.22); background:rgba(217,119,6,.08); }
+.regression-clean span,.regression-warning span { opacity:.72; }
+@media (max-width: 800px) { .regression-hero { flex-direction:column; align-items:flex-start; } }
+
+/* QA multiselect tokens follow the product palette instead of Streamlit error red */
+div[data-baseweb="select"] span[data-baseweb="tag"] {
+  background: rgba(20,184,166,.14) !important;
+  border: 1px solid rgba(20,184,166,.28) !important;
+  color: inherit !important;
+}
+</style>
+""")
+
 OUTPUT_DIR = os.getenv("CRAWLER_OUTPUT_DIR", "output")
 
 STATUS_STYLE = {
@@ -400,8 +430,10 @@ if submitted:
             result = asyncio.run(
                 crawler.crawl_and_process(max_pages=int(max_pages), headless=True, progress_cb=on_progress)
             )
+            result["app_id"] = app_id.strip() or "crawl"
             st.session_state.result = result
             st.session_state.error = None
+            st.session_state.execution_results = []
             summary = result["crawl_summary"]
             st.session_state.history.append({**summary, "app_id": app_id.strip() or "crawl", "_full_result": result})
             dots_slot.empty()
@@ -587,64 +619,195 @@ if result:
     with tab_execution:
         test_cases = result.get("test_cases", [])
         st.subheader(":material/play_circle: Safe QA execution", anchor=False)
-        st.caption("Runs only non-destructive checks such as page structure, form rendering, input discovery, navigation-link presence, and accessibility checks. It does not submit forms or activate arbitrary buttons.")
-        safe_titles = {"Verify form renders correctly", "Verify input controls", "Verify navigation links", "Verify page structure", "Review missing heading structure", "Review accessibility findings"}
+        st.caption("Run only non-destructive browser checks discovered by WebQA. Forms are not submitted and arbitrary buttons are never activated.")
+        safe_titles = {
+            "Verify form renders correctly", "Verify input controls", "Verify navigation links",
+            "Verify page structure", "Review missing heading structure", "Review accessibility findings",
+        }
         safe_cases = [c for c in test_cases if c.get("title") in safe_titles]
-        ec1, ec2, ec3 = st.columns(3)
-        ec1.metric("Executable safe tests", len(safe_cases))
-        ec2.metric("Executed", len(st.session_state.execution_results))
-        passed = sum(r.get("status") == "PASSED" for r in st.session_state.execution_results)
+        results = st.session_state.execution_results or []
+        passed = sum(r.get("status") == "PASSED" for r in results)
+        failed = sum(r.get("status") == "FAILED" for r in results)
+        errors = sum(r.get("status") == "ERROR" for r in results)
+
+        ec1, ec2, ec3, ec4 = st.columns(4)
+        ec1.metric("Available", len(safe_cases))
+        ec2.metric("Executed", len(results))
         ec3.metric("Passed", passed)
+        ec4.metric("Needs review", failed + errors)
+
         if safe_cases:
-            selected_ids = st.multiselect("Select safe tests", [f"{c['id']} — {c['title']}" for c in safe_cases], default=[f"{c['id']} — {c['title']}" for c in safe_cases[:10]])
-            if st.button("Run selected safe tests", icon=":material/play_arrow:", type="primary"):
-                selected = {item.split(" — ", 1)[0] for item in selected_ids}
-                chosen = [c for c in safe_cases if c["id"] in selected]
+            labels = [f"{idx} · {case['title']} · {case.get('url', summary['base_url'])}" for idx, case in enumerate(safe_cases)]
+            default_labels = labels[:10]
+            selected_labels = st.multiselect(
+                "Safe test suite",
+                labels,
+                default=default_labels,
+                placeholder="Choose non-destructive checks…",
+                help="Only checks marked safe by WebQA are executable. Selecting a row identifies the exact test case even when IDs repeat across pages.",
+            )
+            selected_indexes = {int(label.split(" · ", 1)[0]) for label in selected_labels}
+            chosen = [case for idx, case in enumerate(safe_cases) if idx in selected_indexes]
+
+            action_col, info_col = st.columns([1, 2])
+            with action_col:
+                run_clicked = st.button("Run selected safe tests", icon=":material/play_arrow:", type="primary", width="stretch", disabled=not chosen)
+            with info_col:
+                st.markdown(
+                    f'<div class="qa-suite-summary"><span class="qa-suite-dot"></span><strong>{len(chosen)} checks selected</strong><span>·</span><span>non-destructive only</span><span>·</span><span>Playwright</span></div>',
+                    unsafe_allow_html=True,
+                )
+
+            if run_clicked:
+                # Stay on the Execution tab after the action and render the live results
+                # in the same Streamlit run. A rerun here can reset st.tabs() to the
+                # first tab, which makes it look like the execution view disappeared.
+                st.html(
+                    """<div id=\"qa-execution-live\" style=\"display:flex;align-items:center;gap:.6rem;padding:.72rem .9rem;margin:.7rem 0 1rem;border:1px solid rgba(34,197,94,.28);background:rgba(34,197,94,.08);border-radius:12px;\">"
+                    <span style=\"width:9px;height:9px;border-radius:999px;background:#22c55e;box-shadow:0 0 0 5px rgba(34,197,94,.12);animation:dotPulse 1.1s ease-in-out infinite;\"></span>"
+                    <strong>Tests running</strong>"
+                    <span style=\"opacity:.72;\">Safe, non-destructive browser checks are executing now.</span>"
+                    </div>"""
+                )
                 crawler = WebCrawler(url=summary["base_url"], app_id="qa_execution", output_dir=OUTPUT_DIR)
-                with st.spinner("Executing safe QA checks with Playwright..."):
-                    st.session_state.execution_results = asyncio.run(crawler.execute_safe_qa_tests(chosen, headless=True, max_tests=len(chosen)))
+                status = st.status("Running safe QA checks…", expanded=True)
+                status.write(f"Executing {len(chosen)} selected checks with Playwright")
+                with status:
+                    st.session_state.execution_results = asyncio.run(
+                        crawler.execute_safe_qa_tests(chosen, headless=True, max_tests=len(chosen))
+                    )
+                status.update(label="Safe QA execution complete", state="complete")
+                st.toast("Safe QA execution complete", icon=":material/task_alt:")
+                results = st.session_state.execution_results or []
         else:
             st.info("No non-destructive automated checks are available for this crawl.", icon=":material/info:")
-        if st.session_state.execution_results:
-            execution_df = pd.DataFrame(st.session_state.execution_results)
-            st.dataframe(execution_df[["id", "title", "status", "duration_ms", "actual_result"]], width="stretch", hide_index=True)
-            for execution in st.session_state.execution_results:
-                icon = ":material/check_circle:" if execution["status"] == "PASSED" else ":material/error:"
-                with st.expander(f"{icon} {execution['id']} — {execution['title']} — {execution['status']}"):
-                    st.write(execution.get("actual_result", ""))
-                    st.caption(f"Duration: {execution.get('duration_ms', 0)} ms · URL: {execution.get('url', '')}")
-                    if execution.get("evidence"):
-                        st.markdown("**Evidence**")
-                        for item in execution["evidence"]:
-                            st.markdown(f"- {item}")
-                    screenshot = execution.get("screenshot_path", "")
-                    if screenshot and os.path.exists(screenshot):
-                        st.image(screenshot, caption="Execution evidence", width="stretch")
+
+        if results:
+            st.markdown('<div class="qa-section-label">EXECUTION RESULTS</div>', unsafe_allow_html=True)
+            for idx, execution in enumerate(results):
+                status_value = execution.get("status", "UNKNOWN")
+                status_class = {
+                    "PASSED": "qa-status-pass",
+                    "FAILED": "qa-status-fail",
+                    "ERROR": "qa-status-error",
+                }.get(status_value, "qa-status-neutral")
+                icon = {
+                    "PASSED": ":material/check_circle:",
+                    "FAILED": ":material/warning:",
+                    "ERROR": ":material/error:",
+                }.get(status_value, ":material/help:")
+                duration = execution.get("duration_ms", 0)
+                with st.container(border=True):
+                    top_left, top_mid, top_right = st.columns([4, 1, 1], vertical_alignment="center")
+                    with top_left:
+                        st.markdown(f"**{execution.get('id', 'TEST')} · {execution.get('title', 'Safe QA check')}**")
+                        st.caption(execution.get("url", summary["base_url"]))
+                    with top_mid:
+                        st.markdown(f'<span class="qa-result-pill {status_class}">{status_value}</span>', unsafe_allow_html=True)
+                    with top_right:
+                        st.caption(f"{duration} ms")
+                    st.markdown(f"<div class=\"qa-actual\"><strong>Observed:</strong> {execution.get('actual_result', 'No result returned.')}</div>", unsafe_allow_html=True)
+                    meta_cols = st.columns(3)
+                    meta_cols[0].caption(f"Console errors · {sum('Console errors:' in x and not x.endswith(': 0') for x in execution.get('evidence', []))}")
+                    meta_cols[1].caption(f"Evidence items · {len(execution.get('evidence', []))}")
+                    meta_cols[2].caption("Safe · no destructive actions")
+                    with st.expander("Evidence & screenshot"):
+                        if execution.get("evidence"):
+                            for item in execution["evidence"]:
+                                st.markdown(f"- {item}")
+                        screenshot = execution.get("screenshot_path", "")
+                        if screenshot and os.path.exists(screenshot):
+                            st.image(screenshot, caption="Execution evidence", width="stretch")
+
+            st.download_button(
+                "Download execution results",
+                data=json.dumps(results, indent=2),
+                file_name="webqa_safe_execution_results.json",
+                mime="application/json",
+                icon=":material/download:",
+            )
 
     with tab_regression:
         regression = result.get("regression", {})
         st.subheader(":material/compare_arrows: Crawl regression", anchor=False)
-        st.caption("Compares page structure, forms, interactions, links, status, and QA risk with the previous crawl baseline. Content is not stored in the baseline.")
-        if not regression.get("available"):
-            st.info(regression.get("message", "Baseline created for future comparisons."), icon=":material/schedule:")
+        st.caption("Compare the current crawl against a retained structural baseline. The baseline contains page shape, forms, links, interactions, status and QA signals — never page content.")
+
+        if regression.get("baseline_created"):
+            st.markdown(
+                '<div class="regression-hero"><div><div class="premium-kicker">BASELINE ESTABLISHED</div><h3>This crawl is now your reference point.</h3><p>Run the same crawl again later to detect structural drift, new pages, removed pages, or changed QA signals.</p></div><span class="regression-state">READY FOR COMPARISON</span></div>',
+                unsafe_allow_html=True,
+            )
+        elif not regression.get("available"):
+            st.info(regression.get("message", "No baseline is available yet."), icon=":material/schedule:")
         else:
-            rc1, rc2, rc3 = st.columns(3)
-            rc1.metric("Added pages", len(regression.get("added", [])))
-            rc2.metric("Removed pages", len(regression.get("removed", [])))
-            rc3.metric("Changed pages", len(regression.get("changed", [])))
-            if regression.get("added"):
-                st.markdown("### Added pages")
-                for item in regression["added"]:
-                    st.markdown(f"- `{item}`")
-            if regression.get("removed"):
-                st.markdown("### Removed pages")
-                for item in regression["removed"]:
-                    st.markdown(f"- `{item}`")
-            if regression.get("changed"):
-                st.markdown("### Changed pages")
-                st.dataframe(regression["changed"], width="stretch", hide_index=True)
-            if not any(regression.get(k) for k in ("added", "removed", "changed")):
-                st.success("No structural regression detected compared with the previous baseline.", icon=":material/check_circle:")
+            added = regression.get("added", [])
+            removed = regression.get("removed", [])
+            changed = regression.get("changed", [])
+            changed_count = len(added) + len(removed) + len(changed)
+            rc1, rc2, rc3, rc4 = st.columns(4)
+            rc1.metric("Added", len(added))
+            rc2.metric("Removed", len(removed))
+            rc3.metric("Changed", len(changed))
+            rc4.metric("Regression score", "Clean" if changed_count == 0 else f"{changed_count} change{'s' if changed_count != 1 else ''}")
+
+            if changed_count == 0:
+                st.markdown('<div class="regression-clean"><strong>✓ No structural regression detected.</strong><span>The current crawl matches the stored baseline across tracked signals.</span></div>', unsafe_allow_html=True)
+            else:
+                st.markdown('<div class="regression-warning"><strong>Changes detected.</strong><span>Review the affected pages below before updating the baseline.</span></div>', unsafe_allow_html=True)
+
+            if added:
+                with st.expander(f"Added pages · {len(added)}", expanded=True):
+                    for item in added:
+                        st.markdown(f"- `{item}`")
+            if removed:
+                with st.expander(f"Removed pages · {len(removed)}", expanded=True):
+                    for item in removed:
+                        st.markdown(f"- `{item}`")
+            if changed:
+                with st.expander(f"Changed pages · {len(changed)}", expanded=True):
+                    st.dataframe(changed, width="stretch", hide_index=True)
+
+            st.divider()
+            col_update, col_help = st.columns([1, 2], vertical_alignment="center")
+            with col_update:
+                if st.button("Update baseline", icon=":material/bookmark_add:", type="primary", width="stretch"):
+                    # Rebuild the baseline directly from the current result without a second crawl.
+                    snapshot = {
+                        "base_url": summary["base_url"],
+                        "pages": {
+                            page["url"]: {
+                                "title": page.get("title", ""),
+                                "status": page.get("status", "").split(":", 1)[0],
+                                "form_count": len(page.get("forms", [])),
+                                "interactive_element_count": len(page.get("interactive_elements", [])),
+                                "heading_count": len(page.get("headings", [])),
+                                "link_count": page.get("link_count", 0),
+                                "qa_risk_level": page.get("qa_risk_level", "Low"),
+                                "accessibility_finding_count": len(page.get("accessibility_findings", [])),
+                                "api_request_count": len(page.get("api_requests", [])),
+                            }
+                            for page in result.get("pages", [])
+                        },
+                    }
+                    baseline_app_id = result.get("app_id", "crawl")
+                    baseline_path = os.path.join(OUTPUT_DIR, "reports", f"{baseline_app_id}_baseline.json")
+                    os.makedirs(os.path.dirname(baseline_path), exist_ok=True)
+                    with open(baseline_path, "w", encoding="utf-8") as handle:
+                        json.dump(snapshot, handle, indent=2)
+                    result["regression"] = {
+                        "available": True,
+                        "baseline_created": False,
+                        "baseline_updated": True,
+                        "baseline_pages": len(snapshot.get("pages", {})),
+                        "current_pages": len(snapshot.get("pages", {})),
+                        "message": "Current crawl is now the stored baseline.",
+                        "added": [], "removed": [], "changed": [],
+                    }
+                    st.session_state.result = result
+                    st.success("Baseline updated to the current crawl.", icon=":material/bookmark_added:")
+                    st.rerun()
+            with col_help:
+                st.caption("Keep the current baseline when investigating drift. Update it only after you have reviewed the detected changes.")
 
     with tab_report:
         if rag["markdown_path"] and os.path.exists(rag["markdown_path"]):
