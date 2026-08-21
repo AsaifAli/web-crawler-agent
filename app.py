@@ -495,16 +495,32 @@ if result:
         st.bar_chart(chart_data, width="stretch", height=160, color=["#22C55E"])
 
     # Track the results tab so actions inside a tab can programmatically return
-    # the user to the relevant workspace after a rerun. Streamlit supports
-    # stateful tabs when a key and on_change callback are provided.
+    # the user to the relevant workspace after a rerun. The `default` value must
+    # exactly match one of the rendered tab labels (icons included).
     results_tab_key = "webqa_results_tabs"
+    tab_labels = [
+        ":material/web: Pages",
+        ":material/bug_report: QA plan",
+        ":material/play_circle: Execution",
+        ":material/compare_arrows: Regression",
+        ":material/article: Report",
+        ":material/download: Export",
+    ]
+    tab_label_by_name = {
+        "Pages": tab_labels[0],
+        "QA plan": tab_labels[1],
+        "Execution": tab_labels[2],
+        "Regression": tab_labels[3],
+        "Report": tab_labels[4],
+        "Export": tab_labels[5],
+    }
     desired_tab = st.session_state.pop("webqa_desired_tab", None)
-    if desired_tab in {"Pages", "QA plan", "Execution", "Regression", "Report", "Export"}:
-        st.session_state[results_tab_key] = desired_tab
+    default_tab = tab_label_by_name.get(desired_tab, tab_labels[0])
+    st.session_state[results_tab_key] = default_tab
 
     tab_pages, tab_qa, tab_execution, tab_regression, tab_report, tab_export = st.tabs(
-        [":material/web: Pages", ":material/bug_report: QA plan", ":material/play_circle: Execution", ":material/compare_arrows: Regression", ":material/article: Report", ":material/download: Export"],
-        default="Pages",
+        tab_labels,
+        default=default_tab,
         key=results_tab_key,
         on_change="rerun",
     )
