@@ -14,11 +14,13 @@ from crawler import WebCrawler
 
 load_dotenv()
 
-st.set_page_config(page_title="Web crawler", page_icon=":material/travel_explore:", layout="wide")
+st.set_page_config(page_title="WebQA · Web Intelligence & QA", page_icon=":material/travel_explore:", layout="wide", initial_sidebar_state="expanded")
 
 # Shared premium visual layer (presentation-only).
 from ui_theme import apply_theme
+from sidebar_toggle import render_sidebar_toggle
 apply_theme()
+render_sidebar_toggle()
 
 
 st.html("""
@@ -229,17 +231,47 @@ if portfolio_token:
     except Exception:
         pass
 
-# --- Header -------------------------------------------------------------
+# --- Product hero -------------------------------------------------------
 
-st.title(":material/travel_explore: Web crawler", anchor=False)
-st.caption(
-    "Crawls a web application with Playwright, analyzes its structure and health, "
-    "and generates an evidence-based QA plan with prioritized test scenarios."
-)
+summary_count = len(st.session_state.get("history", []))
+st.html(f"""
+<div class="webqa-hero">
+  <div class="webqa-hero-main">
+    <div class="premium-kicker">WEBQA · WEB INTELLIGENCE & QA</div>
+    <h1>Turn a web app into an evidence-backed QA plan.</h1>
+    <p>Crawl dynamic sites with Playwright, understand structure and health, surface risk, and generate safe test scenarios — without turning the crawler into a black box.</p>
+    <div class="chip-row">
+      <span class="premium-chip">● Playwright crawling</span>
+      <span class="premium-chip">● Structural analysis</span>
+      <span class="premium-chip">● Risk detection</span>
+      <span class="premium-chip">● Evidence-based QA</span>
+    </div>
+  </div>
+  <div class="webqa-hero-flow">
+    <div class="premium-kicker">HOW WEBQA WORKS</div>
+    <div class="flow-step"><b>01</b><div><strong>Crawl</strong><span>Discover pages, forms, links and network signals.</span></div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><b>02</b><div><strong>Understand</strong><span>Normalize structure, accessibility, errors and risk.</span></div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><b>03</b><div><strong>Generate</strong><span>Create prioritized QA scenarios with evidence.</span></div></div>
+  </div>
+</div>
+<div class="webqa-ready-strip">
+  <div><span class="status-dot"></span><strong>Workspace ready</strong><span class="webqa-muted"> · Safe-by-default crawling</span></div>
+  <div class="webqa-ready-metrics">
+    <span><small>SESSION RUNS</small><b>{summary_count}</b></span>
+    <span><small>ENGINE</small><b>Playwright</b></span>
+    <span><small>QA MODE</small><b>Evidence-backed</b></span>
+  </div>
+</div>
+""")
 
 # --- Sidebar: connection + run history -----------------------------------
 
 with st.sidebar:
+    st.markdown('<div class="sidebar-brand"><div class="sidebar-brand-mark">◉</div><div><strong>WebQA</strong><span>WEB INTELLIGENCE</span></div></div>', unsafe_allow_html=True)
+    st.markdown('<div class="premium-kicker">RESEARCH & QA WORKSPACE</div>', unsafe_allow_html=True)
+    st.caption("Crawl → understand → test. Safe by default.")
     st.subheader(":material/smart_toy: AI summaries", anchor=False)
 
     # Local development can keep using the LiteLLM gateway. Cloud deployments
@@ -299,27 +331,25 @@ with st.sidebar:
                     st.session_state.result = run["_full_result"]
                     st.rerun()
 
-# --- Crawl form -----------------------------------------------------------
+# --- Crawl workspace ------------------------------------------------------
+
+st.html("""<div class="workspace-kicker">CRAWL WORKSPACE</div><div class="workspace-title">Target a web application</div><div class="workspace-subtitle">Configure the crawl, keep it bounded, and let WebQA turn the result into an actionable QA plan.</div>""")
 
 with st.form("crawl_form", border=True):
-    st.subheader(":material/link: Target", anchor=False)
+    st.markdown('<div class="form-section-label">01 · Target</div>', unsafe_allow_html=True)
     url = st.text_input("Start URL", placeholder="https://example.com")
 
     col1, col2 = st.columns(2)
     with col1:
-        username = st.text_input("Username (optional)", icon=":material/person:")
         app_id = st.text_input("Run label", value="crawl", icon=":material/label:")
+        username = st.text_input("Username (optional)", icon=":material/person:")
     with col2:
-        password = st.text_input("Password (optional)", type="password", icon=":material/lock:")
         max_pages = st.slider("Max pages", min_value=1, max_value=100, value=10)
+        password = st.text_input("Password (optional)", type="password", icon=":material/lock:")
 
-    sections_raw = st.text_input(
-        "Extra section paths (comma-separated, optional)", placeholder="/about, /contact"
-    )
-
-    submitted = st.form_submit_button(
-        "Start crawl", icon=":material/play_arrow:", type="primary", width="stretch"
-    )
+    sections_raw = st.text_input("Extra section paths (comma-separated, optional)", placeholder="/about, /contact")
+    st.markdown('<div class="form-footer">Same-domain crawl · non-destructive by default · evidence retained in-session</div>', unsafe_allow_html=True)
+    submitted = st.form_submit_button("Start crawl", icon=":material/rocket_launch:", type="primary", width="stretch")
 
 # --- Run crawl --------------------------------------------------------------
 
@@ -406,6 +436,8 @@ if result:
     rag = result["rag_document"]
 
     st.divider()
+    risk_level = "High attention" if summary.get("high_risk_pages", 0) else ("Review" if summary.get("medium_risk_pages", 0) else "Healthy")
+    st.html(f"""<div class="result-banner"><div><div class="premium-kicker">CRAWL COMPLETE</div><div class="result-title">{summary['base_url']}</div><div class="result-subtitle">{summary['pages_visited_count']} pages analyzed · {summary.get('test_case_count', 0)} QA scenarios · {risk_level}</div></div><div class="result-badges"><span class="result-badge"><b>{summary['pages_visited_count']}</b><small>PAGES</small></span><span class="result-badge"><b>{summary.get('high_risk_pages', 0)}</b><small>HIGH RISK</small></span><span class="result-badge"><b>{summary.get('accessibility_finding_count', 0)}</b><small>A11Y</small></span></div></div>""")
 
     banner_col, chart_col = st.columns([2, 1])
     with banner_col:
@@ -688,6 +720,4 @@ if result:
                 width="stretch",
             )
 else:
-    st.divider()
-    with st.container(key="empty_state_container"):
-        st.info("Enter a URL above and start a crawl to see results here.", icon=":material/travel_explore:")
+    st.html("""<div class="empty-webqa"><div class="empty-icon">⌁</div><div><div class="premium-kicker">READY WHEN YOU ARE</div><h3>Start with a URL. Finish with a QA plan.</h3><p>WebQA discovers what is on the site, what looks risky, and which safe checks are worth running next.</p></div><div class="empty-points"><span>Same-domain crawl</span><span>Structural evidence</span><span>Safe QA execution</span></div></div>""")
