@@ -21,3 +21,11 @@ services:
         value: "5"
       - key: CRAWL_MAX_DEPTH
         value: "2"
+
+  - type: web
+    name: webqa-harness
+    runtime: docker
+    plan: free
+    region: singapore
+    healthCheckPath: /health
+    autoDeploy: true
