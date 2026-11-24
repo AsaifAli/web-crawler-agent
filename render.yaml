@@ -21,11 +21,9 @@ services:
         value: "5"
       - key: CRAWL_MAX_DEPTH
         value: "2"
-
-  - type: web
-    name: webqa-harness
-    runtime: docker
-    plan: free
-    region: singapore
-    healthCheckPath: /health
-    autoDeploy: true
+      - key: PORTFOLIO_SESSION_GATEWAY_URL
+        sync: false
+      - key: LLM_GATEWAY_URL
+        sync: false
+      - key: LLM_GATEWAY_MODEL
+        value: portfolio-free
