@@ -34,3 +34,9 @@ def test_exchange_rejects_invalid_codes_without_network(code: str) -> None:
 def test_exchange_requires_gateway_configuration() -> None:
     with pytest.raises(GatewayHandoffError, match="not configured"):
         exchange_handoff_code("a" * 43, gateway_url="")
+
+
+def test_handoff_uses_the_website_project_slug() -> None:
+    from gateway_handoff import PROJECT
+
+    assert PROJECT == "webqa-intelligence"
