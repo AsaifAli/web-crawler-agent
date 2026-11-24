@@ -11,8 +11,71 @@ import streamlit as st
 from dotenv import load_dotenv
 
 from crawler import WebCrawler
+from gateway_handoff import GatewayHandoffError, exchange_handoff_code
 
 load_dotenv()
+
+_HANDOFF_PARAM = "portfolio_llm_handoff"
+_LEGACY_HANDOFF_PARAM = "portfolio_llm_session"
+
+
+def _clear_portfolio_gateway_session() -> None:
+    st.session_state.pop("webqa_gateway_token", None)
+    st.session_state.pop("webqa_gateway_expires_at", None)
+
+
+def _process_portfolio_gateway_handoff() -> None:
+    # A reusable bearer token in a URL is explicitly not accepted.
+    if _LEGACY_HANDOFF_PARAM in st.query_params:
+        _clear_portfolio_gateway_session()
+        try:
+            del st.query_params[_LEGACY_HANDOFF_PARAM]
+        except Exception:
+            pass
+        st.session_state["webqa_gateway_error"] = (
+            "This older session link is no longer supported. Reopen WebQA from the website."
+        )
+        return
+
+    if _HANDOFF_PARAM not in st.query_params:
+        token = str(st.session_state.get("webqa_gateway_token", "") or "")
+        try:
+            expires_at = float(st.session_state.get("webqa_gateway_expires_at", 0) or 0)
+        except (TypeError, ValueError, OverflowError):
+            expires_at = 0
+        if token and expires_at <= time.time():
+            _clear_portfolio_gateway_session()
+            st.session_state["webqa_gateway_error"] = (
+                "Your WebQA AI session expired. Launch WebQA again from the website."
+            )
+        return
+
+    code = str(st.query_params.get(_HANDOFF_PARAM, "") or "").strip()
+    _clear_portfolio_gateway_session()
+    try:
+        del st.query_params[_HANDOFF_PARAM]
+    except Exception:
+        st.session_state["webqa_gateway_error"] = (
+            "The launch code could not be removed from the URL. Return to the website and launch again."
+        )
+        return
+
+    if not code:
+        st.session_state["webqa_gateway_error"] = (
+            "The WebQA launch code is missing. Launch again from the website."
+        )
+        return
+
+    try:
+        exchanged = exchange_handoff_code(code)
+    except GatewayHandoffError as exc:
+        st.session_state["webqa_gateway_error"] = str(exc)
+        return
+
+    st.session_state["webqa_gateway_token"] = exchanged["access_token"]
+    st.session_state["webqa_gateway_expires_at"] = time.time() + exchanged["expires_in"]
+    st.session_state.pop("webqa_gateway_error", None)
+
 
 st.set_page_config(page_title="WebQA · Web Intelligence & QA", page_icon=":material/travel_explore:", layout="wide", initial_sidebar_state="expanded")
 # Portfolio session handoff (BYOK remains owned by the shared website Gateway).
@@ -87,6 +150,11 @@ from ui_theme import apply_theme
 from sidebar_toggle import render_sidebar_toggle
 apply_theme()
 render_sidebar_toggle()
+
+_process_portfolio_gateway_handoff()
+if st.session_state.get("webqa_gateway_error"):
+    st.warning(st.session_state["webqa_gateway_error"])
+
 
 
 st.html("""
