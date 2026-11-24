@@ -11,8 +11,71 @@ import streamlit as st
 from dotenv import load_dotenv
 
 from crawler import WebCrawler
+from gateway_handoff import GatewayHandoffError, exchange_handoff_code
 
 load_dotenv()
+
+_HANDOFF_PARAM = "portfolio_llm_handoff"
+_LEGACY_HANDOFF_PARAM = "portfolio_llm_session"
+
+
+def _clear_portfolio_gateway_session() -> None:
+    st.session_state.pop("webqa_gateway_token", None)
+    st.session_state.pop("webqa_gateway_expires_at", None)
+
+
+def _process_portfolio_gateway_handoff() -> None:
+    # A reusable bearer token in a URL is explicitly not accepted.
+    if _LEGACY_HANDOFF_PARAM in st.query_params:
+        _clear_portfolio_gateway_session()
+        try:
+            del st.query_params[_LEGACY_HANDOFF_PARAM]
+        except Exception:
+            pass
+        st.session_state["webqa_gateway_error"] = (
+            "This older session link is no longer supported. Reopen WebQA from the website."
+        )
+        return
+
+    if _HANDOFF_PARAM not in st.query_params:
+        token = str(st.session_state.get("webqa_gateway_token", "") or "")
+        try:
+            expires_at = float(st.session_state.get("webqa_gateway_expires_at", 0) or 0)
+        except (TypeError, ValueError, OverflowError):
+            expires_at = 0
+        if token and expires_at <= time.time():
+            _clear_portfolio_gateway_session()
+            st.session_state["webqa_gateway_error"] = (
+                "Your WebQA AI session expired. Launch WebQA again from the website."
+            )
+        return
+
+    code = str(st.query_params.get(_HANDOFF_PARAM, "") or "").strip()
+    _clear_portfolio_gateway_session()
+    try:
+        del st.query_params[_HANDOFF_PARAM]
+    except Exception:
+        st.session_state["webqa_gateway_error"] = (
+            "The launch code could not be removed from the URL. Return to the website and launch again."
+        )
+        return
+
+    if not code:
+        st.session_state["webqa_gateway_error"] = (
+            "The WebQA launch code is missing. Launch again from the website."
+        )
+        return
+
+    try:
+        exchanged = exchange_handoff_code(code)
+    except GatewayHandoffError as exc:
+        st.session_state["webqa_gateway_error"] = str(exc)
+        return
+
+    st.session_state["webqa_gateway_token"] = exchanged["access_token"]
+    st.session_state["webqa_gateway_expires_at"] = time.time() + exchanged["expires_in"]
+    st.session_state.pop("webqa_gateway_error", None)
+
 
 st.set_page_config(page_title="WebQA · Web Intelligence & QA", page_icon=":material/travel_explore:", layout="wide", initial_sidebar_state="expanded")
 
@@ -22,7 +85,10 @@ from sidebar_toggle import render_sidebar_toggle
 apply_theme()
 render_sidebar_toggle()
 
-
+_process_portfolio_gateway_handoff()
+if st.session_state.get("webqa_gateway_error"):
+    st.warning(st.session_state["webqa_gateway_error"])
+# Portfolio session handoff (BYOK remains owned by the shared website Gateway).
 st.html("""
 <style>
 @keyframes fadeInUp {
@@ -250,16 +316,8 @@ if "history" not in st.session_state:
 if "execution_results" not in st.session_state:
     st.session_state.execution_results = []
 
-# Portfolio handoff: the portfolio passes a short-lived gateway JWT when this
-# app is launched from a portfolio project page. Capture it once into the
-# Streamlit session and remove it from the visible URL.
-portfolio_token = str(st.query_params.get("portfolio_llm_session", "")).strip()
-if portfolio_token:
-    st.session_state.llm_gateway_session_token = portfolio_token
-    try:
-        del st.query_params["portfolio_llm_session"]
-    except Exception:
-        pass
+# Hosted AI credentials are set only by the one-time handoff above.
+# No reusable bearer token is ever accepted from the URL.
 
 # --- Product hero -------------------------------------------------------
 
@@ -307,43 +365,57 @@ with st.sidebar:
     # Local development can keep using the LiteLLM gateway. Cloud deployments
     # can bypass it and call any OpenAI-compatible endpoint directly (for
     # example OpenRouter) by setting OPENAI_BASE_URL / OPENAI_API_KEY.
+    portfolio_gateway_token = str(st.session_state.get("webqa_gateway_token", "") or "").strip()
+    try:
+        portfolio_gateway_active = bool(
+            portfolio_gateway_token
+            and float(st.session_state.get("webqa_gateway_expires_at", 0) or 0) > time.time()
+        )
+    except (TypeError, ValueError, OverflowError):
+        _clear_portfolio_gateway_session()
+        portfolio_gateway_active = False
     gateway_url = os.getenv("LLM_GATEWAY_URL", "")
-    gateway_key = st.session_state.get("llm_gateway_session_token", "") or os.getenv("LLM_GATEWAY_API_KEY", "")
+    # Local-only fallback remains available for direct development sessions.
+    local_gateway_key = os.getenv("LLM_GATEWAY_API_KEY", "")
     direct_url = os.getenv("OPENAI_BASE_URL", "")
     direct_key = os.getenv("OPENAI_API_KEY", "")
-    gateway_enabled = (
-        os.getenv("LLM_GATEWAY_ENABLED", "").lower() == "true"
-        or bool(gateway_key)
-        or bool(direct_key)
-    )
+    local_mode = os.getenv("WEBQA_ALLOW_LOCAL_LLM", "false").lower() == "true"
+    if portfolio_gateway_active:
+        gateway_key = portfolio_gateway_token
+        llm_base_url = gateway_url
+        llm_model = os.getenv("LLM_GATEWAY_MODEL", "portfolio-free")
+        default_ai = True
+    elif local_mode:
+        gateway_key = local_gateway_key or direct_key
+        llm_base_url = gateway_url or direct_url
+        llm_model = os.getenv("LLM_GATEWAY_MODEL", "") or os.getenv("LLM_MODEL", "") or os.getenv("OPENAI_MODEL", "portfolio-free")
+        default_ai = bool(gateway_key and llm_base_url)
+    else:
+        gateway_key = ""
+        llm_base_url = ""
+        llm_model = "portfolio-free"
+        default_ai = False
 
     use_ai = st.toggle(
         "Generate AI summary",
-        value=gateway_enabled,
-        help="Uses the configured OpenAI-compatible LLM endpoint. Local development can use LiteLLM; cloud deployments can use OpenRouter directly.",
+        value=default_ai,
+        disabled=not (portfolio_gateway_active or (local_mode and gateway_key and llm_base_url)),
+        help="Website launches use the short-lived shared Gateway session. Direct keys are only accepted when WEBQA_ALLOW_LOCAL_LLM=true for local development.",
     )
 
-    if use_ai and (gateway_key or direct_key):
-        llm_base_url = gateway_url or direct_url or "https://openrouter.ai/api/v1"
-        llm_api_key = gateway_key or direct_key
-        llm_model = (
-            ("" if st.session_state.get("llm_gateway_session_token") else os.getenv("LLM_GATEWAY_MODEL", ""))
-            or os.getenv("LLM_MODEL", "")
-            or os.getenv("OPENAI_MODEL", "")
-            or os.getenv("OPENAI_MODEL_ID", "")
-            or "openrouter/free"
-        )
+    if use_ai and (portfolio_gateway_active or (local_mode and gateway_key and llm_base_url)):
+        llm_api_key = gateway_key
         ollama_url = os.getenv("OLLAMA_URL", "")
         ollama_model = os.getenv("OLLAMA_MODEL", "")
     else:
-        llm_base_url, llm_api_key, llm_model = "", "", "openrouter/free"
+        llm_base_url, llm_api_key, llm_model = "", "", "portfolio-free"
         ollama_url = (
             os.getenv("OLLAMA_URL", "")
             if os.getenv("USE_OLLAMA_FALLBACK", "false").lower() == "true"
             else ""
         )
         ollama_model = os.getenv("OLLAMA_MODEL", "")
-        st.caption("AI summaries are optional. Without an LLM key, the crawler uses a short text excerpt.")
+        st.caption("AI summaries are optional. Launch WebQA from the website to use its shared Gateway session.")
 
     st.divider()
     st.subheader(":material/history: Run history", anchor=False)

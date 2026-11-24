@@ -133,3 +133,18 @@ The optional Ollama profile can be enabled using the repository's documented com
 ## Portfolio positioning
 
 **QA intelligence workbench** — fast browser analysis, evidence-backed test planning, safe execution, and regression visibility rather than a generic web scraper.
+
+## Portfolio website + shared Gateway launch
+
+Hosted WebQA demonstrations are launched from the AI Engineering Studio website. The website owns BYOK, provider selection, and credential custody; WebQA receives only a short-lived project-scoped session after exchanging a single-use handoff code.
+
+Configure the hosted Streamlit deployment:
+
+- `PORTFOLIO_SESSION_GATEWAY_URL`: shared Portfolio LLM Gateway root URL.
+- `LLM_GATEWAY_URL`: OpenAI-compatible inference base URL for the Gateway (normally ends in `/v1`).
+- `LLM_GATEWAY_MODEL`: approved Gateway model identifier (default `portfolio-free`).
+
+Do not configure user provider keys or reusable shared provider credentials in the hosted WebQA service. `WEBQA_ALLOW_LOCAL_LLM=true` exists only for an explicitly local development setup; leave it false in the hosted portfolio deployment.
+
+The one-time `portfolio_llm_handoff` code is removed from the URL before exchange. The returned bearer remains in Streamlit server-side session state until its Gateway expiry. The legacy reusable `portfolio_llm_session` URL parameter is rejected. Crawl discovery, safe execution policy, regression baselines, and report generation remain unchanged.
+
