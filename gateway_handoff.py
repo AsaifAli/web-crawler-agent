@@ -14,7 +14,7 @@ from urllib.parse import urlsplit, urlunsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 from typing import Any
 
-PROJECT = "webqa"
+PROJECT = "webqa-intelligence"
 TIMEOUT_SECONDS = 8
 MAX_RESPONSE_BYTES = 64 * 1024
 CODE_PATTERN = re.compile(r"^[A-Za-z0-9_-]{32,128}$")
