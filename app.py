@@ -442,10 +442,14 @@ with st.sidebar:
     # can bypass it and call any OpenAI-compatible endpoint directly (for
     # example OpenRouter) by setting OPENAI_BASE_URL / OPENAI_API_KEY.
     portfolio_gateway_token = str(st.session_state.get("webqa_gateway_token", "") or "").strip()
-    portfolio_gateway_active = bool(
-        portfolio_gateway_token
-        and float(st.session_state.get("webqa_gateway_expires_at", 0) or 0) > time.time()
-    )
+    try:
+        portfolio_gateway_active = bool(
+            portfolio_gateway_token
+            and float(st.session_state.get("webqa_gateway_expires_at", 0) or 0) > time.time()
+        )
+    except (TypeError, ValueError, OverflowError):
+        _clear_portfolio_gateway_session()
+        portfolio_gateway_active = False
     gateway_url = os.getenv("LLM_GATEWAY_URL", "")
     # Local-only fallback remains available for direct development sessions.
     local_gateway_key = os.getenv("LLM_GATEWAY_API_KEY", "")
