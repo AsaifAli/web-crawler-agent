@@ -441,43 +441,53 @@ with st.sidebar:
     # Local development can keep using the LiteLLM gateway. Cloud deployments
     # can bypass it and call any OpenAI-compatible endpoint directly (for
     # example OpenRouter) by setting OPENAI_BASE_URL / OPENAI_API_KEY.
+    portfolio_gateway_token = str(st.session_state.get("webqa_gateway_token", "") or "").strip()
+    portfolio_gateway_active = bool(
+        portfolio_gateway_token
+        and float(st.session_state.get("webqa_gateway_expires_at", 0) or 0) > time.time()
+    )
     gateway_url = os.getenv("LLM_GATEWAY_URL", "")
-    gateway_key = st.session_state.get("llm_gateway_session_token", "") or os.getenv("LLM_GATEWAY_API_KEY", "")
+    # Local-only fallback remains available for direct development sessions.
+    local_gateway_key = os.getenv("LLM_GATEWAY_API_KEY", "")
     direct_url = os.getenv("OPENAI_BASE_URL", "")
     direct_key = os.getenv("OPENAI_API_KEY", "")
-    gateway_enabled = (
-        os.getenv("LLM_GATEWAY_ENABLED", "").lower() == "true"
-        or bool(gateway_key)
-        or bool(direct_key)
-    )
+    local_mode = os.getenv("WEBQA_ALLOW_LOCAL_LLM", "false").lower() == "true"
+    if portfolio_gateway_active:
+        gateway_key = portfolio_gateway_token
+        llm_base_url = gateway_url
+        llm_model = os.getenv("LLM_GATEWAY_MODEL", "portfolio-free")
+        default_ai = True
+    elif local_mode:
+        gateway_key = local_gateway_key or direct_key
+        llm_base_url = gateway_url or direct_url
+        llm_model = os.getenv("LLM_GATEWAY_MODEL", "") or os.getenv("LLM_MODEL", "") or os.getenv("OPENAI_MODEL", "portfolio-free")
+        default_ai = bool(gateway_key and llm_base_url)
+    else:
+        gateway_key = ""
+        llm_base_url = ""
+        llm_model = "portfolio-free"
+        default_ai = False
 
     use_ai = st.toggle(
         "Generate AI summary",
-        value=gateway_enabled,
-        help="Uses the configured OpenAI-compatible LLM endpoint. Local development can use LiteLLM; cloud deployments can use OpenRouter directly.",
+        value=default_ai,
+        disabled=not (portfolio_gateway_active or (local_mode and gateway_key and llm_base_url)),
+        help="Website launches use the short-lived shared Gateway session. Direct keys are only accepted when WEBQA_ALLOW_LOCAL_LLM=true for local development.",
     )
 
-    if use_ai and (gateway_key or direct_key):
-        llm_base_url = gateway_url or direct_url or "https://openrouter.ai/api/v1"
-        llm_api_key = gateway_key or direct_key
-        llm_model = (
-            ("" if st.session_state.get("llm_gateway_session_token") else os.getenv("LLM_GATEWAY_MODEL", ""))
-            or os.getenv("LLM_MODEL", "")
-            or os.getenv("OPENAI_MODEL", "")
-            or os.getenv("OPENAI_MODEL_ID", "")
-            or "openrouter/free"
-        )
+    if use_ai and (portfolio_gateway_active or (local_mode and gateway_key and llm_base_url)):
+        llm_api_key = gateway_key
         ollama_url = os.getenv("OLLAMA_URL", "")
         ollama_model = os.getenv("OLLAMA_MODEL", "")
     else:
-        llm_base_url, llm_api_key, llm_model = "", "", "openrouter/free"
+        llm_base_url, llm_api_key, llm_model = "", "", "portfolio-free"
         ollama_url = (
             os.getenv("OLLAMA_URL", "")
             if os.getenv("USE_OLLAMA_FALLBACK", "false").lower() == "true"
             else ""
         )
         ollama_model = os.getenv("OLLAMA_MODEL", "")
-        st.caption("AI summaries are optional. Without an LLM key, the crawler uses a short text excerpt.")
+        st.caption("AI summaries are optional. Launch WebQA from the website to use its shared Gateway session.")
 
     st.divider()
     st.subheader(":material/history: Run history", anchor=False)
