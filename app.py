@@ -78,6 +78,16 @@ def _process_portfolio_gateway_handoff() -> None:
 
 
 st.set_page_config(page_title="WebQA · Web Intelligence & QA", page_icon=":material/travel_explore:", layout="wide", initial_sidebar_state="expanded")
+
+# Shared premium visual layer (presentation-only).
+from ui_theme import apply_theme
+from sidebar_toggle import render_sidebar_toggle
+apply_theme()
+render_sidebar_toggle()
+
+_process_portfolio_gateway_handoff()
+if st.session_state.get("webqa_gateway_error"):
+    st.warning(st.session_state["webqa_gateway_error"])
 # Portfolio session handoff (BYOK remains owned by the shared website Gateway).
 st.html("""
 <style>
